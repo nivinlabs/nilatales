@@ -68,7 +68,7 @@
 </nav>
 
 <script>
-  // Bedtime Mode: darken page background + twilights
+  // Bedtime Mode: toggle dark theme via CSS variables on <html>
   const btn = document.getElementById('bedtime-toggle');
   if (btn) {
     btn.addEventListener('click', () => {
@@ -76,16 +76,23 @@
       btn.setAttribute('aria-pressed', String(!active));
       document.documentElement.classList.toggle('bedtime-active', !active);
     });
-    // Optional: activate on schedule (e.g. after 7pm)
   }
+
+  // Nav active state — mark current section
+  const navLinks = document.querySelectorAll('nav a[href]');
+  const currentPath = window.location.pathname;
+  navLinks.forEach((link) => {
+    const href = link.getAttribute('href') ?? '';
+    if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
+      link.classList.add('nav-active');
+    }
+  });
 </script>
 
 <style>
-  .bedtime-active {
-    --bg-page: #1B1B2E;
-  }
-  .bedtime-active body {
-    background-color: #1B1B2E;
-    color: #E8E0F0;
+  .nav-active {
+    background-color: var(--color-twilight-50);
+    color: var(--color-twilight-500) !important;
+    box-shadow: var(--clay-pressed);
   }
 </style>

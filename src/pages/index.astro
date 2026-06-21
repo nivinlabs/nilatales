@@ -84,11 +84,17 @@ function readingTime(story: { data: { body?: string } }) {
   <!-- ══════════════════════════════════════════════
        §1 HERO — Tonight's Tale
        2-col desktop: cover image + deck + CTA
+       Floating clay blobs behind hero for depth
   ══════════════════════════════════════════════ -->
   {heroStory && (
-    <section id="hero" class="py-10 md:py-16" aria-label="Tonight's Tale">
-      <div class="max-w-5xl mx-auto px-4 sm:px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+    <section id="hero" class="py-10 md:py-16 relative overflow-hidden" aria-label="Tonight's Tale">
+      <!-- Floating clay blobs (decorative, performance-gated) -->
+      <div class="clay-blob clay-blob-lilac" style="width: 300px; height: 300px; top: -60px; right: -40px;" aria-hidden="true"></div>
+      <div class="clay-blob clay-blob-peach clay-blob-2" style="width: 250px; height: 250px; bottom: -40px; left: -60px;" aria-hidden="true"></div>
+      <div class="clay-blob clay-blob-mint clay-blob-3" style="width: 200px; height: 200px; top: 40%; left: 45%;" aria-hidden="true"></div>
+
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center clay-enter">
 
           <!-- Left: story cover — clay-raised card -->
           <a
@@ -130,7 +136,7 @@ function readingTime(story: { data: { body?: string } }) {
               {heroStory.data.title}
             </h1>
             {heroStory.data.subtitle && (
-              <p class="font-display italic text-display text-lg md:text-xl font-light text-kohl-500 leading-snug">
+              <p class="font-rounded italic text-display text-lg md:text-xl font-light text-kohl-500 leading-snug">
                 {heroStory.data.subtitle}
               </p>
             )}
@@ -199,11 +205,11 @@ function readingTime(story: { data: { body?: string } }) {
 
       <SectionHeader eyebrow="EXPLORE · பிரிவுகள்" tamil="ஆறு தூண்கள்" />
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 clay-enter-stagger">
         {pillars.map(({ emoji, cat, label, en, href, count }) => (
           <a
             href={href}
-            class="flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
+            class="clay-card flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
             aria-label={`${label} — ${en} (${count} items)`}
           >
             <!-- Monogram emoji in colored pill -->
@@ -259,7 +265,7 @@ function readingTime(story: { data: { body?: string } }) {
           href="/stories/"
         />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 clay-enter-stagger">
           {featuredStories.map((story) => {
             const cover = resolveCover(story.data.cover, { width: 400 });
             const href  = storyRoute(story);
@@ -267,7 +273,7 @@ function readingTime(story: { data: { body?: string } }) {
             return (
               <a
                 href={href}
-                class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-0.5 transition-all duration-200"
+                class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-1 transition-all duration-200 clay-card"
                 aria-label={story.data.title}
               >
                 <!-- Image — clay-card shadow, 4:3 -->
@@ -287,7 +293,7 @@ function readingTime(story: { data: { body?: string } }) {
                 <!-- Body -->
                 <div class="flex flex-col gap-2 p-5">
                   <span class={`cat-pill cat-pill-${accent} w-fit`}>{story.data.kind?.toUpperCase()}</span>
-                  <h3 class="font-display font-bold text-[1.05rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                  <h3 class="font-rounded font-bold text-[1.05rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                     {story.data.title}
                   </h3>
                   {story.data.summary && (
@@ -324,14 +330,14 @@ function readingTime(story: { data: { body?: string } }) {
           href="/listen/"
         />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 clay-enter-stagger">
           {listenItems.map((a) => {
             const href = `/listen/${idBasename(a)}/`;
             const accent = a.data.type === 'lullaby' ? 'violet' : 'sky';
             return (
               <a
                 href={href}
-                class="flex flex-col gap-4 p-5 rounded-2xl bg-paper-50 border border-paper-300 hover:bg-paper-100 transition-colors duration-150 group"
+                class="clay-card flex flex-col gap-4 p-5 rounded-2xl bg-paper-50 border border-paper-300 hover:bg-paper-100 transition-colors duration-150 group"
                 aria-label={`Listen to ${a.data.title}`}
               >
                 <!-- Play button row -->
@@ -352,7 +358,7 @@ function readingTime(story: { data: { body?: string } }) {
                   </button>
                 </div>
                 <!-- Title -->
-                <h3 class="font-display font-bold text-[1rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                <h3 class="font-rounded font-bold text-[1rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                   {a.data.title}
                 </h3>
                 <!-- Duration + age -->
@@ -387,7 +393,7 @@ function readingTime(story: { data: { body?: string } }) {
           href="/comics/"
         />
 
-        <div class="flex gap-5 overflow-x-auto scroll-snap-x pb-4 -mx-4 px-4">
+        <div class="flex gap-5 overflow-x-auto scroll-snap-x scroll-fade-edges pb-4 -mx-4 px-4">
           {comics.map((comic, i) => {
             const cover = resolveCover(comic.data.cover, { width: 360 });
             const href  = `/comics/${idBasename(comic)}/`;
@@ -420,7 +426,7 @@ function readingTime(story: { data: { body?: string } }) {
                   <p class="font-mono text-[0.6rem] text-paper-400 uppercase tracking-widest">
                     STRIP {String(i + 1).padStart(2, '0')}
                   </p>
-                  <h3 class="font-display font-bold text-[0.95rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                  <h3 class="font-rounded font-bold text-[0.95rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                     {comic.data.title}
                   </h3>
                   {comic.data.summary && (
@@ -471,7 +477,7 @@ function readingTime(story: { data: { body?: string } }) {
                   ></div>
                   <!-- Title + summary -->
                   <div class="flex-1 min-w-0">
-                    <h3 class="font-display font-bold text-[1.0625rem] text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
+                    <h3 class="font-rounded font-bold text-[1.0625rem] text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
                       {story.data.title}
                     </h3>
                     {story.data.summary && (
@@ -507,7 +513,7 @@ function readingTime(story: { data: { body?: string } }) {
 
         <p class="eyebrow">ஆசிரியர்களுக்கும் பெற்றோர்களுக்கும் · FOR GROWN-UPS</p>
 
-        <div class="p-6 rounded-2xl bg-paper-200 border border-paper-300 flex flex-col gap-3 text-left w-full">
+        <div class="clay-card p-6 rounded-2xl bg-paper-200 border border-paper-300 flex flex-col gap-3 text-left w-full">
           <p class="font-ui text-[1.0625rem] text-slate-700 leading-relaxed">
             Lesson plans, vocabulary guides, and parent notes — everything you need
             to continue the story at home or in class.

@@ -19,7 +19,7 @@
  * Google Fonts are loaded in Layout.astro <head> — do NOT put <link> tags here.
  * @import the stylesheet URL so browsers load it (won't double-fetch if already in <head>).
  */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Baloo+2:wght@400;500;600;700;800&display=swap');
 
 @import 'tailwindcss';
 
@@ -61,6 +61,9 @@
   --font-serif-ta: 'Noto Serif Tamil', 'Latha', 'Tamil Sangam MN', serif;
   --font-sans-ta:  'Noto Sans Tamil', 'Latha', 'Tamil Sangam MN', sans-serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  /* Baloo 2 — rounded, bubbly for kid-facing headings (card titles, kid labels) */
+  --font-rounded: 'Baloo 2', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-rounded-ta: 'Baloo 2', 'Noto Sans Tamil', 'Latha', sans-serif;
 
   /* ── Radius scale (4 levels, per claymorphism design spec) ───── */
   --radius-sm:  0.75rem;   /* 12px — chips, small badges */
@@ -81,6 +84,19 @@
   /* ── Newspaper rules ──────────────────────────────────────────── */
   --rule:         1px solid var(--color-paper-300);
   --rule-strong:   2px solid var(--color-kohl-700);
+
+  /* ── Claymorphism pastel surfaces (never pure white) ──────────── */
+  --color-clay-bg:      #F4F1FA;   /* cool lavender-white base */
+  --color-clay-surface: rgba(255, 255, 255, 0.72);  /* glass-clay card */
+  --color-clay-peach:   #FDBCB4;
+  --color-clay-mint:    #B5E8C8;
+  --color-clay-lilac:   #DDD0F5;
+  --color-clay-sky:     #C4DEF0;
+  --color-clay-butter:  #FBE8B6;
+
+  /* ── Gradient for primary CTA buttons ─────────────────────────── */
+  --gradient-clay-cta: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%);
+  --gradient-clay-cta-hover: linear-gradient(135deg, #8B6FE8 0%, #5B3FB0 100%);
 }
 
 /* ─── 3. Base ────────────────────────────────────────────────────────────── */
@@ -228,14 +244,14 @@ h1, h2, h3, h4, h5, h6,
 
 /* ─── 6. Clay components ────────────────────────────────────────────────── */
 
-/* Clay CTA button — primary action pill */
+/* Clay CTA button — primary action pill with violet gradient */
 .btn-clay-primary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   border-radius: 9999px;
-  background-color: var(--color-twilight-500);
+  background: var(--gradient-clay-cta);
   color: white;
   font-family: var(--font-ui);
   font-size: 1rem;
@@ -245,10 +261,16 @@ h1, h2, h3, h4, h5, h6,
   cursor: pointer;
   border: none;
   min-height: 52px;
-  transition: background-color 150ms ease;
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 200ms ease-out,
+              background 150ms ease;
 }
-.btn-clay-primary:hover   { background-color: var(--color-twilight-700); }
-.btn-clay-primary:active  { background-color: var(--color-twilight-700); box-shadow: var(--clay-pressed); }
+.btn-clay-primary:hover   { background: var(--gradient-clay-cta-hover); }
+.btn-clay-primary:active  {
+  background: var(--gradient-clay-cta-hover);
+  box-shadow: var(--clay-pressed);
+  transform: scale(0.95);
+}
 
 /* Clay play button — circular, for audio */
 .btn-play {
@@ -269,6 +291,13 @@ h1, h2, h3, h4, h5, h6,
 /* Play button sizes */
 .btn-play-56 { width: 56px; height: 56px; }
 .btn-play-80 { width: 80px; height: 80px; }
+
+/* Play button spring squish on press */
+.btn-play:active {
+  transform: scale(0.92);
+  box-shadow: var(--clay-pressed);
+  transition: transform 100ms ease-out, box-shadow 100ms ease-out;
+}
 
 /* ─── 7. Accessibility ──────────────────────────────────────────────────── */
 
@@ -355,3 +384,126 @@ section[id] {
 }
 .scroll-snap-x::-webkit-scrollbar { display: none; }
 .scroll-snap-item { scroll-snap-align: start; }
+
+/* ─── 14. Floating clay blobs (decorative) ──────────────────────────────── */
+
+@keyframes blob-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(20px, -15px) scale(1.05); }
+}
+
+.clay-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+  animation: blob-drift 8s ease-in-out infinite alternate;
+}
+.clay-blob-lilac  { background: var(--color-clay-lilac); }
+.clay-blob-peach  { background: var(--color-clay-peach); }
+.clay-blob-mint   { background: var(--color-clay-mint); }
+
+/* Stagger blob animations so they don't sync */
+.clay-blob-2 { animation-delay: -3s; animation-duration: 10s; }
+.clay-blob-3 { animation-delay: -5s; animation-duration: 12s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .clay-blob { animation: none; }
+}
+
+/* ─── 15. Entrance animations ───────────────────────────────────────────── */
+
+@keyframes clay-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.clay-enter {
+  animation: clay-fade-in 400ms ease-out both;
+}
+.clay-enter-stagger > * {
+  animation: clay-fade-in 400ms ease-out both;
+}
+.clay-enter-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.clay-enter-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.clay-enter-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.clay-enter-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.clay-enter-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.clay-enter-stagger > *:nth-child(6) { animation-delay: 250ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .clay-enter,
+  .clay-enter-stagger > * {
+    animation: none;
+  }
+}
+
+/* ─── 16. Bedtime Mode (dark theme) ─────────────────────────────────────── */
+
+.bedtime-active {
+  --color-paper-50:  #1a1a2e;
+  --color-paper-100: #16213e;
+  --color-paper-200: #0f1626;
+  --color-paper-300: #1e2a3a;
+  --color-paper-400: #4a5a6e;
+  --color-kohl-300:  #8b88a3;
+  --color-kohl-500:  #a8a5bd;
+  --color-kohl-700:  #d4d2e0;
+  --color-kohl-900:  #e8e8f0;
+  --color-twilight-50:  #2a1f4a;
+  --color-twilight-300: #6b5fb8;
+  --color-twilight-500: #9d7ff0;
+  --color-twilight-700: #b89df5;
+  --clay-card:    inset -2px -2px 6px rgba(255,255,255,0.05),
+                  4px 4px 12px rgba(0,0,0,0.3);
+  --clay-raised:  inset -3px -3px 8px rgba(255,255,255,0.08),
+                  6px 6px 16px rgba(0,0,0,0.4);
+  --clay-comic:   inset -3px -3px 10px rgba(255,255,255,0.1),
+                  inset 2px 2px 6px rgba(0,0,0,0.15),
+                  8px 8px 24px rgba(0,0,0,0.5);
+  --clay-pressed: inset 3px 3px 8px rgba(0,0,0,0.3),
+                  inset -1px -1px 4px rgba(255,255,255,0.05);
+  --gradient-clay-cta: linear-gradient(135deg, #9d7ff0 0%, #6b4fb8 100%);
+  --gradient-clay-cta-hover: linear-gradient(135deg, #8b6fe8 0%, #5b3fb0 100%);
+  --rule: 1px solid var(--color-paper-300);
+  --rule-strong: 2px solid var(--color-kohl-700);
+}
+
+.bedtime-active body {
+  background-color: #1a1a2e;
+  color: #e8e8f0;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.bedtime-active .clay-card,
+.bedtime-active .clay-raised,
+.bedtime-active .clay-comic {
+  box-shadow: var(--clay-card);
+}
+
+/* Bedtime toggle active glow */
+.bedtime-active #bedtime-toggle {
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  color: #9d7ff0 !important;
+  border-color: #2a1f4a !important;
+  box-shadow: 0 0 20px rgba(157, 127, 240, 0.3);
+}
+
+/* Smooth transition for bedtime mode toggle */
+body {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* ─── 17. Scroll-snap edge fade for comic strip ─────────────────────────── */
+
+.scroll-fade-edges {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+}
+
+/* ─── 18. Rounded font utility ──────────────────────────────────────────── */
+
+.font-rounded { font-family: var(--font-rounded); }
+.font-rounded-ta { font-family: var(--font-rounded-ta); }
