@@ -11,7 +11,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview --host 0.0.0.0 --port 4321",
-    "start": "serve -s dist -l ${PORT:-8080} -c 1 --no-clipboard",
+    "start": "serve -s dist -l tcp://:8080 --no-clipboard",
     "astro": "astro"
   },
   "dependencies": {

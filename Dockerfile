@@ -31,4 +31,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # serve -s dist  → SPA fallback ( Astro static output has its own _redirects )
-CMD ["serve", "-s", "dist", "-l", "${PORT:-8080}", "-c", "1", "--no-clipboard"]
+CMD ["serve", "-s", "dist", "-l", "tcp://:8080", "--no-clipboard"]
