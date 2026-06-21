@@ -1,0 +1,25 @@
+# build output
+dist/
+.astro/
+
+# deps
+node_modules/
+
+# logs
+*.log
+npm-debug.log*
+
+# env
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# editors
+.vscode/
+.idea/
+
+# Hostinger upload bundle (when generated)
+nilatales-hostinger.zip

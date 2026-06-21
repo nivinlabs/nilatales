@@ -1,0 +1,63 @@
+---
+/**
+ * /activities/ — Printables: coloring, worksheets, crafts.
+ */
+import Layout from '../../layouts/Layout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import { publishedActivities } from '../../utils/content';
+import { getEntry } from 'astro:content';
+import { idBasename } from '../../utils/content';
+
+const entries = await publishedActivities();
+
+// Resolve all linkedStory references up-front for the cards.
+const linkedStories = new Map<string, Awaited<ReturnType<typeof getEntry<'stories'>>>>();
+for (const a of entries) {
+  if (a.data.linkedStory && !linkedStories.has(a.data.linkedStory.id)) {
+    linkedStories.set(a.data.linkedStory.id, await getEntry(a.data.linkedStory));
+  }
+}
+---
+
+<Layout
+  title="வர்ணம் தீட்டு & செயல்பாடுகள் · Activities"
+  description="Printable Tamil coloring pages, worksheets, and crafts — every one tied to a story on NilaTales."
+  lang="ta"
+>
+  <CategoryHeader
+    emoji="🖍️"
+    tamil="வர்ணம் தீட்டு & செயல்பாடுகள்"
+    english="Color & Activity"
+    description="Printable coloring pages, vocabulary worksheets, and hands-on crafts. Every activity is tied to a story on the site — so kids read the story, then make something about it."
+    accentColor="sky"
+    count={entries.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {entries.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        செயல்பாடுகள் விரைவில் வரும் · Activities coming soon.
+      </p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {entries.map((a) => {
+          const ls = a.data.linkedStory ? linkedStories.get(a.data.linkedStory.id) : null;
+          return (
+          <StoryCard
+            href={`/activities/${idBasename(a)}/`}
+            title={a.data.title}
+            titleEnglish={a.data.titleEnglish}
+            summary={ls ? `${a.data.kind === 'coloring' ? 'A coloring page' : a.data.kind === 'worksheet' ? 'A printable worksheet' : 'A hands-on craft'} for the story "${ls.data.title}".` : ''}
+            cover={a.data.previewImage ?? (ls ? ls.data.cover : null)}
+            coverAlt={a.data.titleEnglish ?? a.data.title}
+            badge={a.data.kind === 'coloring' ? '🖍️ Coloring' : a.data.kind === 'worksheet' ? '📝 Worksheet' : '✂️ Craft'}
+            accentColor="sky"
+            ageRange={a.data.ageRange}
+          />
+          );
+        })}
+      </div>
+    )}
+  </section>
+</Layout>

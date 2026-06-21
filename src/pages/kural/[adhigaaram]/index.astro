@@ -1,0 +1,89 @@
+---
+/**
+ * /kural/<adhigaaram>/ — all kurals in one chapter (adhigaaram).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import { publishedStories, storyRoute } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await publishedStories();
+  const adhigaarams = new Map<string, { tamil: string; paal: string }>();
+  for (const s of stories) {
+    if (s.data.source?.kind !== 'thirukkural') continue;
+    const k = s.data.source.kural;
+    if (!adhigaarams.has(String(k.adhigaaramNumber))) {
+      adhigaarams.set(String(k.adhigaaramNumber), {
+        tamil: k.adhigaaramTamil,
+        paal: k.paal,
+      });
+    }
+  }
+  return Array.from(adhigaarams.entries()).map(([num, info]) => ({
+    params: { adhigaaram: num },
+    props: { adhigaaramTamil: info.tamil, paal: info.paal, adhigaaramNumber: Number(num) },
+  }));
+}
+
+interface Props {
+  adhigaaramTamil: string;
+  paal: string;
+  adhigaaramNumber: number;
+}
+
+const { adhigaaramTamil, paal, adhigaaramNumber } = Astro.props;
+const all = await publishedStories();
+const kuralsInChapter = all.filter((s) => {
+  if (s.data.source?.kind !== 'thirukkural') return false;
+  return s.data.source.kural.adhigaaramNumber === adhigaaramNumber;
+});
+
+const paalNames: Record<string, string> = {
+  aram: 'அறம்',
+  porul: 'பொருள்',
+  inbam: 'இன்பம்',
+};
+---
+
+<Layout
+  title={`அதிகாரம் ${adhigaaramNumber}: ${adhigaaramTamil} · Thirukkural`}
+  description={`All Thirukkural stories in the chapter "${adhigaaramTamil}".`}
+  lang="ta"
+>
+  <header class="py-12 bg-moon-50 border-b border-moon-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <p lang="en" class="text-sm font-display uppercase tracking-[0.2em] text-moon-600 mb-2">
+        Thirukkural · Chapter {adhigaaramNumber}
+      </p>
+      <h1 lang="ta" class="text-3xl sm:text-4xl font-display font-bold text-nila-950">
+        அதிகாரம் {adhigaaramNumber}: {adhigaaramTamil}
+      </h1>
+      <p class="mt-2 text-slate-600 font-display">
+        பால்: {paalNames[paal] ?? paal} · {kuralsInChapter.length} குறள்{kuralsInChapter.length === 1 ? '' : 'கள்'}
+      </p>
+    </div>
+  </header>
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {kuralsInChapter.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">No stories yet in this chapter.</p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {kuralsInChapter.map((s) => (
+          <StoryCard
+            href={storyRoute(s)}
+            title={s.data.title}
+            titleEnglish={s.data.titleEnglish}
+            summary={s.data.summary}
+            cover={s.data.cover}
+            coverAlt={s.data.coverAlt}
+            badge={`குறள் #${s.data.source?.kind === 'thirukkural' ? s.data.source.kural.number : ''}`}
+            accentColor="moon"
+            readingTimeMin={s.data.readingTimeMin}
+            ageRange={s.data.ageRange}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

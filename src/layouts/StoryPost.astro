@@ -1,0 +1,285 @@
+---
+/**
+ * StoryPost — prose layout for stories (moral, folktale, panchatantra, thirukkural).
+ *
+ * Redesigned per DESIGN.md §6 Post page (Story):
+ *   - Sticky right-rail sidebar on desktop (reading time, age, audio/activity links)
+ *   - Drop-cap first letter
+ *   - KuralCoupletBlock for Thirukkural
+ *   - Panchatantra context block
+ *   - Continue with… cross-links
+ */
+import Layout from './Layout.astro';
+import PostHeader from '../components/PostHeader.astro';
+import { resolveCover, idBasename } from '../utils/content';
+import { getEntry, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'stories'>;
+}
+
+const { post } = Astro.props;
+const data = post.data;
+
+// Accent class for kind
+const accentClass =
+  data.kind === 'thirukkural' ? 'amber'
+  : data.kind === 'panchatantra' ? 'moss'
+  : data.kind === 'folktale' ? 'leaf'
+  : 'twilight';
+
+// Resolve cover
+const coverMeta = await resolveCover(data.cover, { width: 1600 });
+
+// Pre-resolve linked audio, activity, teacher-guide references
+const audioEntry = data.audioNarration ? await getEntry(data.audioNarration) : null;
+const activityEntry = data.activity ? await getEntry(data.activity) : null;
+const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : null;
+---
+
+<Layout
+  title={data.title}
+  description={data.summary}
+  lang={data.language === 'ta-en' ? 'ta-en' : 'ta'}
+  showMasthead={true}
+>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-10 items-start">
+
+      <!-- ── Main column ───────────────────────── -->
+      <div>
+        <PostHeader
+          kind={data.kind}
+          kindLabel={
+            data.kind === 'thirukkural' ? 'திருக்குறள் கதை'
+            : data.kind === 'panchatantra' ? 'பஞ்சதந்திர கதை'
+            : data.kind === 'folktale' ? 'நாட்டுப்புற கதை'
+            : 'கதை'
+          }
+          accentColor={accentClass}
+          title={data.title}
+          titleEnglish={data.titleEnglish}
+          subtitle={data.subtitle}
+          summary={data.summary}
+          moral={data.moral}
+          ageRange={data.ageRange}
+          readingTimeMin={data.readingTimeMin}
+          difficulty={data.difficulty}
+          pubDate={data.pubDate}
+          cover={coverMeta ?? undefined}
+          coverAlt={data.coverAlt}
+        />
+
+        <!-- Thirukkural: couplet block -->
+        {data.kind === 'thirukkural' && data.source?.kind === 'thirukkural' && (
+          <section class="max-w-2xl mx-auto mb-10 py-8 bg-paper-200 border-y border-kohl-300">
+            <div class="text-center mb-4">
+              <span class="eyebrow">
+                குறள் #{data.source.kural.number} · அதிகாரம் {data.source.kural.adhigaaramNumber}
+                · {data.source.kural.paal}
+              </span>
+            </div>
+            <blockquote lang="ta" class="kural-couplet">
+              {data.source.kural.tamil ?? data.source.kural.coupletTamil}
+            </blockquote>
+            <div class="mt-4 text-center space-y-2 px-4">
+              {data.source.kural.transliteration && (
+                <p lang="ta-Latn" class="font-mono text-sm text-kohl-500 italic">
+                  {data.source.kural.transliteration}
+                </p>
+              )}
+              {data.source.kural.meaning?.en && (
+                <p lang="en" class="font-ui text-base text-kohl-700 italic">
+                  "{data.source.kural.meaning.en}"
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        <!-- Panchatantra: frame-tale context -->
+        {data.kind === 'panchatantra' && data.source?.kind === 'panchatantra' && (
+          <section class="max-w-2xl mx-auto mb-8 p-5 rounded-2xl bg-paper-200 border border-paper-300">
+            <span class="eyebrow mb-2 block">PANCHANTANTRA · {data.source.panchatantra.tantra}</span>
+            {data.source.panchatantra.frameTaleTamil && (
+              <p lang="ta" class="font-serif-ta text-[1rem] text-kohl-700 leading-relaxed">
+                <strong>Frame tale:</strong> {data.source.panchatantra.frameTaleTamil}
+                {data.source.panchatantra.frameTale && (
+                  <span lang="en" class="text-sm text-kohl-500 italic block mt-1">
+                    ({data.source.panchatantra.frameTale})
+                  </span>
+                )}
+              </p>
+            )}
+            {data.source.panchatantra.innerTaleTitle && (
+              <p lang="ta" class="mt-3 text-sm font-serif-ta text-kohl-700">
+                <strong>Inner tale:</strong> {data.source.panchatantra.innerTaleTitle}
+              </p>
+            )}
+          </section>
+        )}
+
+        <!-- Story body — drop cap + Tamil prose -->
+        <article class="max-w-prose">
+          <div class="prose-ta drop-cap">
+            <slot />
+          </div>
+
+          <!-- Illustrations -->
+          {data.illustrations?.length > 0 && (
+            <section class="mt-12 space-y-8" aria-label="Illustrations">
+              {await Promise.all(
+                data.illustrations.map(async (ill) => {
+                  const opt = await resolveCover(ill.src, { width: 1200 });
+                  if (!opt) return null;
+                  return (
+                    <figure class="rounded-2xl overflow-hidden border border-paper-200 bg-paper-100">
+                      <img
+                        src={opt.src}
+                        width={opt.width}
+                        height={opt.height}
+                        alt={ill.alt}
+                        loading="lazy"
+                        class="w-full h-auto"
+                      />
+                      {ill.caption && (
+                        <figcaption lang="ta" class="px-4 py-2 font-mono text-[0.75rem] text-kohl-500 italic bg-paper-100 border-t border-paper-200">
+                          {ill.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                })
+              )}
+            </section>
+          )}
+        </article>
+
+        <!-- Continue with… cross-links -->
+        {(audioEntry || activityEntry || teacherEntry) && (
+          <footer class="mt-16 pt-8 border-t border-paper-300">
+            <h2 class="font-display font-bold text-[1.125rem] text-kohl-700 mb-5">
+              Continue with…
+            </h2>
+            <ul class="space-y-3">
+              {audioEntry && (
+                <li>
+                  <a
+                    href={`/listen/${idBasename(audioEntry)}/`}
+                    class="flex items-center gap-3 p-4 rounded-xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-colors group"
+                  >
+                    <!-- Play icon -->
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-violet)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 9-14 9V3z"/></svg>
+                    </span>
+                    <div>
+                      <p class="font-ui font-semibold text-sm text-kohl-700 group-hover:text-violet transition-colors">
+                        🎧 Listen to this story
+                      </p>
+                      <p lang="ta" class="font-serif-ta text-sm text-kohl-500">{audioEntry.data.title}</p>
+                    </div>
+                  </a>
+                </li>
+              )}
+              {activityEntry && (
+                <li>
+                  <a
+                    href={`/activities/${idBasename(activityEntry)}/`}
+                    class="flex items-center gap-3 p-4 rounded-xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-colors group"
+                  >
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-sky)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                    </span>
+                    <div>
+                      <p class="font-ui font-semibold text-sm text-kohl-700 group-hover:text-sky transition-colors">
+                        🖍️ Printable activity
+                      </p>
+                      <p lang="ta" class="font-serif-ta text-sm text-kohl-500">{activityEntry.data.title}</p>
+                    </div>
+                  </a>
+                </li>
+              )}
+              {teacherEntry && (
+                <li>
+                  <a
+                    href={`/grownups/${idBasename(teacherEntry)}/`}
+                    class="flex items-center gap-3 p-4 rounded-xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-colors group"
+                  >
+                    <span class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-slate)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <div>
+                      <p class="font-ui font-semibold text-sm text-kohl-700 group-hover:text-slate transition-colors">
+                        👩‍🏫 Teacher's guide
+                      </p>
+                      <p lang="ta" class="font-serif-ta text-sm text-kohl-500">{teacherEntry.data.title}</p>
+                    </div>
+                  </a>
+                </li>
+              )}
+            </ul>
+          </footer>
+        )}
+      </div>
+
+      <!-- ── Sticky right rail (desktop only) ─── -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-4">
+
+          <!-- Reading meta card -->
+          <div class="p-4 rounded-2xl bg-paper-100 border border-paper-200 space-y-3">
+            {data.ageRange && (
+              <div class="flex items-center gap-2">
+                <span class="eyebrow">Age</span>
+                <span class="font-ui text-sm font-medium text-kohl-700">{data.ageRange.min}–{data.ageRange.max} yr</span>
+              </div>
+            )}
+            {data.readingTimeMin && (
+              <div class="flex items-center gap-2">
+                <span class="eyebrow">Read</span>
+                <span class="font-ui text-sm font-medium text-kohl-700">{data.readingTimeMin} min</span>
+              </div>
+            )}
+            {data.difficulty && (
+              <div class="flex items-center gap-2">
+                <span class="eyebrow">Level</span>
+                <span class="font-ui text-sm font-medium text-kohl-700 capitalize">{data.difficulty}</span>
+              </div>
+            )}
+            {data.kind && (
+              <div class="flex items-center gap-2">
+                <span class="eyebrow">Kind</span>
+                <span class={`cat-pill cat-pill-${accentClass} text-[0.6rem]`}>{data.kind}</span>
+              </div>
+            )}
+          </div>
+
+          <!-- Audio CTA -->
+          {audioEntry && (
+            <a
+              href={`/listen/${idBasename(audioEntry)}/`}
+              class="btn-clay-primary w-full justify-center flex gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
+              Listen instead
+            </a>
+          )}
+
+          <!-- Activity CTA -->
+          {activityEntry && (
+            <a
+              href={`/activities/${idBasename(activityEntry)}/`}
+              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full border-2 border-sky-500 text-sky-700 font-ui font-semibold text-sm hover:bg-sky-50 transition-colors"
+              style="border-color: var(--color-sky); color: var(--color-sky)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+              Print activity
+            </a>
+          )}
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,24 @@
+---
+import AudioPost from '../../layouts/AudioPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const audio = await getCollection('audio', ({ data }) => data.draft === false);
+  return audio.map((entry) => ({
+    params: { slug: idBasename(entry) },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'audio'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<AudioPost post={entry}>
+  <Content />
+</AudioPost>

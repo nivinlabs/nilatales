@@ -1,0 +1,556 @@
+---
+/**
+ * Homepage — newspaper-for-kids redesign.
+ * 9 sections per DESIGN.md §6:
+ *   1. Hero (2-col: story cover + deck + clay CTA)
+ *   2. Six pillars (3×2 category tiles)
+ *   3. Thirukkural of the Week (KuralBand)
+ *   4. Featured stories (3-col card grid)
+ *   5. Listen strip (4-col with clay play button)
+ *   6. Comics strip (3-col clay-comic, scroll-snap)
+ *   7. Recent stories (newspaper table)
+ *   8. For grown-ups (slate box)
+ *   9. About closing
+ *
+ * All sections gracefully degrade if collection is empty.
+ * DESIGN.md §9.
+ */
+import Layout from '../layouts/Layout.astro';
+import StoryCard from '../components/StoryCard.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import KuralBand from '../components/KuralBand.astro';
+import CategoryPill from '../components/CategoryPill.astro';
+import PlayButton from '../components/PlayButton.astro';
+import { publishedStories, publishedComics, publishedAudio, storyRoute, resolveCover, idBasename } from '../utils/content';
+
+const stories  = await publishedStories();
+const comics   = await publishedComics();
+const audio    = await publishedAudio();
+
+// Hero: featured story, fallback to most recent
+const heroStory = stories.find((s) => s.data.featured) ?? stories[0];
+
+// Kural of the week
+const kurals = stories.filter((s) => s.data.kind === 'thirukkural');
+const kuralStory = kurals.find((s) => s.data.featured) ?? kurals[0];
+
+// Six pillars — static (derived from seed content counts, degrade gracefully)
+const pillars = [
+  { emoji: '🌙', cat: 'leaf',   label: 'கதைகள்',  en: 'Stories',     href: '/stories/',    count: stories.filter(s => s.data.kind !== 'thirukkural' && s.data.kind !== 'panchatantra').length },
+  { emoji: '📜', cat: 'amber',  label: 'குறள்',    en: 'Kural',       href: '/kural/',      count: kurals.length },
+  { emoji: '📚', cat: 'moss',   label: 'பஞ்சதந்திரம்', en: 'Panchatantra', href: '/panchatantra/', count: stories.filter(s => s.data.kind === 'panchatantra').length },
+  { emoji: '🎨', cat: 'rose',   label: 'நகைச்சுவை', en: 'Comics',     href: '/comics/',     count: comics.length },
+  { emoji: '🎧', cat: 'violet', label: 'கேட்க',    en: 'Listen',      href: '/listen/',     count: audio.length },
+  { emoji: '🖍️', cat: 'sky',    label: 'விளையாட்டு', en: 'Activities', href: '/activities/', count: 0 },
+];
+
+// Featured 3 stories (exclude hero)
+const featuredStories = stories
+  .filter((s) => s.id !== heroStory?.id)
+  .slice(0, 3);
+
+// Listen: first 4 audio entries
+const listenItems = audio.slice(0, 4);
+
+// Recent stories: next 5 after featured (for newspaper table)
+const recentStories = stories
+  .filter((s) => s.id !== heroStory?.id)
+  .slice(3, 8);
+
+// Grown-ups: just a quiet notice — data driven if we add resources later
+const grownupsHref = '/grownups/';
+
+// Helpers
+function accentForKind(kind: string): string {
+  const map: Record<string, string> = {
+    moral: 'leaf', thirukkural: 'amber', panchatatantra: 'moss',
+    comic: 'rose', lullaby: 'violet', narration: 'violet',
+    activity: 'sky', 'teacher-guide': 'slate',
+  };
+  return map[kind] ?? 'leaf';
+}
+
+function readingTime(story: { data: { body?: string } }) {
+  const words = (story.data.body ?? '').split(/\s+/).length;
+  return `${Math.ceil(words / 150)} min read`;
+}
+---
+
+<Layout
+  title="நிலா கதைகள் · NilaTales"
+  description="Illustrated Tamil bedtime stories for children. Moral tales, Thirukkural, Panchatantra, comics, lullabies, and activities."
+>
+
+  <!-- ══════════════════════════════════════════════
+       §1 HERO — Tonight's Tale
+       2-col desktop: cover image + deck + CTA
+  ══════════════════════════════════════════════ -->
+  {heroStory && (
+    <section id="hero" class="py-10 md:py-16" aria-label="Tonight's Tale">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+
+          <!-- Left: story cover — clay-raised card -->
+          <a
+            href={storyRoute(heroStory)}
+            class="clay-raised rounded-3xl overflow-hidden block aspect-[4/5] relative group"
+            aria-label={`Cover for ${heroStory.data.title}`}
+          >
+            {(() => {
+              const cover = resolveCover(heroStory.data.cover, { width: 600 });
+              return cover.src
+                ? <img
+                    src={cover.src}
+                    alt={heroStory.data.title}
+                    width={cover.width ?? 600}
+                    height={Math.round((cover.width ?? 600) * 5 / 4)}
+                    class="w-full h-full object-cover"
+                    loading="eager"
+                  />
+                : <div class="w-full h-full bg-twilight-50 flex items-center justify-center">
+                    <span class="text-6xl">🌙</span>
+                  </div>;
+            })()}
+            <!-- Hover overlay -->
+            <div class="absolute inset-0 bg-kohl-900/0 group-hover:bg-kohl-900/20 transition-colors duration-300" aria-hidden="true"></div>
+          </a>
+
+          <!-- Right: deck -->
+          <div class="flex flex-col gap-5">
+            <!-- Vol/Issue + date eyebrow -->
+            <div class="flex items-center gap-3">
+              <span class="eyebrow">VOL 1 · ISSUE 12</span>
+              <div class="h-px flex-1 bg-paper-300 max-w-[60px]"></div>
+              <span class="font-mono-editorial">21 ஜூன் 2026</span>
+            </div>
+
+            <!-- H1: Tamil title + English subtitle -->
+            <h1 class="font-display text-display font-black text-[2.25rem] md:text-5xl text-kohl-900 leading-none tracking-tight"
+                style="font-optical-sizing:auto">
+              {heroStory.data.title}
+            </h1>
+            {heroStory.data.subtitle && (
+              <p class="font-display italic text-display text-lg md:text-xl font-light text-kohl-500 leading-snug">
+                {heroStory.data.subtitle}
+              </p>
+            )}
+
+            <!-- Age + reading time -->
+            <div class="flex items-center gap-3">
+              <span class="chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                {heroStory.data.ageRange ?? '3–8'} yr
+              </span>
+              <span class="chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                {readingTime(heroStory)}
+              </span>
+            </div>
+
+            <!-- Kind badge -->
+            {heroStory.data.kind && (
+              <span class={`cat-pill cat-pill-${accentForKind(heroStory.data.kind)} w-fit`}>
+                {heroStory.data.kind.toUpperCase()}
+              </span>
+            )}
+
+            <!-- Summary (dek) -->
+            {heroStory.data.summary && (
+              <p class="font-ui text-sm text-kohl-500 leading-relaxed line-clamp-3">
+                {heroStory.data.summary}
+              </p>
+            )}
+
+            <!-- Clay CTA pill -->
+            <a
+              href={storyRoute(heroStory)}
+              class="btn-clay-primary self-start flex items-center gap-2 mt-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              இன்றைய கதையைப் படி · Read tonight
+            </a>
+
+            <!-- Secondary listen link -->
+            {audio.find(a => a.data.title === heroStory.data.title) && (
+              <a
+                href={`/listen/${idBasename(audio.find(a => a.data.title === heroStory.data.title)!)}/`}
+                class="flex items-center gap-2 font-ui text-sm font-semibold text-twilight-500 hover:text-twilight-700 transition-colors min-h-[44px]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
+                🎧 Listen instead
+              </a>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §2 SIX PILLARS — category tiles
+       3-col desktop, 2-col tablet, 2-col mobile
+  ══════════════════════════════════════════════ -->
+  <section id="pillars" class="py-12 md:py-16" aria-label="Six Pillars">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+      <SectionHeader eyebrow="EXPLORE · பிரிவுகள்" tamil="ஆறு தூண்கள்" />
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {pillars.map(({ emoji, cat, label, en, href, count }) => (
+          <a
+            href={href}
+            class="flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
+            aria-label={`${label} — ${en} (${count} items)`}
+          >
+            <!-- Monogram emoji in colored pill -->
+            <span
+              class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl"
+              style={`background: rgba(var(--color-${cat}), 0.12)`}
+              aria-hidden="true"
+            >
+              {emoji}
+            </span>
+            <!-- Title stack -->
+            <div>
+              <p class="font-serif-ta text-base font-semibold text-kohl-700 leading-none">{label}</p>
+              <p class="font-ui text-xs font-medium text-paper-400 mt-0.5">{en}</p>
+            </div>
+            <!-- Count -->
+            <p class="font-mono text-[0.6875rem] text-paper-400 mt-auto">
+              {count > 0 ? `${count} ${count === 1 ? 'item' : 'items'}` : 'Coming soon'}
+            </p>
+          </a>
+        ))}
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §3 THIRUKKURAL OF THE WEEK
+  ══════════════════════════════════════════════ -->
+  {kuralStory && kuralStory.data.source?.kural && (
+    <KuralBand
+      couplet={kuralStory.data.source.kural.tamil ?? ''}
+      transliteration={kuralStory.data.source.kural.transliteration ?? ''}
+      meaning={kuralStory.data.source.kural.meaning?.en ?? ''}
+      storyHref={storyRoute(kuralStory)}
+      storyLabel="குறளின் கதையைப் படி · Read the story"
+    />
+  )}
+
+  <!-- ══════════════════════════════════════════════
+       §4 FEATURED STORIES — 3-col card grid
+  ══════════════════════════════════════════════ -->
+  {featuredStories.length > 0 && (
+    <section id="featured" class="py-12 md:py-16" aria-label="Featured Stories">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+        <SectionHeader
+          eyebrow="FEATURED · சிறந்த"
+          tamil="சிறந்த கதைகள்"
+          href="/stories/"
+        />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredStories.map((story) => {
+            const cover = resolveCover(story.data.cover, { width: 400 });
+            const href  = storyRoute(story);
+            const accent = accentForKind(story.data.kind ?? '');
+            return (
+              <a
+                href={href}
+                class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-0.5 transition-all duration-200"
+                aria-label={story.data.title}
+              >
+                <!-- Image — clay-card shadow, 4:3 -->
+                <div class="aspect-[4/3] overflow-hidden bg-paper-200">
+                  {cover.src
+                    ? <img
+                        src={cover.src}
+                        alt={story.data.title}
+                        width={cover.width ?? 400}
+                        height={Math.round((cover.width ?? 400) * 3 / 4)}
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-4xl" aria-hidden="true">📖</div>
+                  }
+                </div>
+                <!-- Body -->
+                <div class="flex flex-col gap-2 p-5">
+                  <span class={`cat-pill cat-pill-${accent} w-fit`}>{story.data.kind?.toUpperCase()}</span>
+                  <h3 class="font-display font-bold text-[1.05rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                    {story.data.title}
+                  </h3>
+                  {story.data.summary && (
+                    <p class="font-ui text-[0.8125rem] text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
+                  )}
+                  <!-- Footer chips -->
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="chip">{story.data.ageRange ?? '3–8'} yr</span>
+                    <span class="chip">{readingTime(story)}</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  )}
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §5 LISTEN STRIP — audio cards with clay play button
+  ══════════════════════════════════════════════ -->
+  {listenItems.length > 0 && (
+    <section id="listen" class="py-12 md:py-16" aria-label="Listen">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+        <SectionHeader
+          eyebrow="LISTEN · கேட்க"
+          tamil="கதைகளைக் கேட்க"
+          href="/listen/"
+        />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {listenItems.map((a) => {
+            const href = `/listen/${idBasename(a)}/`;
+            const accent = a.data.type === 'lullaby' ? 'violet' : 'sky';
+            return (
+              <a
+                href={href}
+                class="flex flex-col gap-4 p-5 rounded-2xl bg-paper-50 border border-paper-300 hover:bg-paper-100 transition-colors duration-150 group"
+                aria-label={`Listen to ${a.data.title}`}
+              >
+                <!-- Play button row -->
+                <div class="flex items-center justify-between">
+                  <span class={`cat-pill cat-pill-${accent} w-fit`}>
+                    {a.data.type === 'lullaby' ? '🎵 LULLABY' : '🎧 NARRATION'}
+                  </span>
+                  <!-- Clay play button — inline SVG play icon -->
+                  <button
+                    type="button"
+                    class="btn-play btn-play-56 clay-raised flex items-center justify-center rounded-full"
+                    aria-label={`Play ${a.data.title}`}
+                    onclick="event.preventDefault()"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true" style="margin-left:2px">
+                      <path d="M5 3l14 9-14 9V3z"/>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Title -->
+                <h3 class="font-display font-bold text-[1rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                  {a.data.title}
+                </h3>
+                <!-- Duration + age -->
+                <div class="flex items-center gap-2 mt-auto">
+                  <span class="font-mono text-[0.6875rem] text-paper-400">{a.data.duration ?? '—'}</span>
+                  {a.data.audioAgeRange && (
+                    <span class="chip">{a.data.audioAgeRange}+ yr</span>
+                  )}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  )}
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §6 COMICS STRIP — clay-comic, scroll-snap
+  ══════════════════════════════════════════════ -->
+  {comics.length > 0 && (
+    <section id="comics" class="py-12 md:py-16" aria-label="Comics">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+        <SectionHeader
+          eyebrow="COMICS · நகைச்சுவை"
+          tamil="வசதியாகப் படியுங்கள்"
+          href="/comics/"
+        />
+
+        <div class="flex gap-5 overflow-x-auto scroll-snap-x pb-4 -mx-4 px-4">
+          {comics.map((comic, i) => {
+            const cover = resolveCover(comic.data.cover, { width: 360 });
+            const href  = `/comics/${idBasename(comic)}/`;
+            return (
+              <a
+                href={href}
+                class:list={[
+                  'scroll-snap-item flex-shrink-0 w-[260px] flex flex-col gap-3',
+                  'clay-comic rounded-3xl bg-paper-50 border border-paper-200 overflow-hidden',
+                  'group hover:-translate-y-1 transition-all duration-200',
+                ]}
+                aria-label={comic.data.title}
+              >
+                <!-- Cover image -->
+                <div class="aspect-[4/5] overflow-hidden bg-paper-200 p-3 pb-0">
+                  {cover.src
+                    ? <img
+                        src={cover.src}
+                        alt={comic.data.title}
+                        width={360}
+                        height={450}
+                        class="w-full h-full object-cover rounded-2xl"
+                        loading="lazy"
+                      />
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-5xl rounded-xl" aria-hidden="true">🎨</div>
+                  }
+                </div>
+                <!-- Card body -->
+                <div class="p-4 pt-2 flex flex-col gap-1">
+                  <p class="font-mono text-[0.6rem] text-paper-400 uppercase tracking-widest">
+                    STRIP {String(i + 1).padStart(2, '0')}
+                  </p>
+                  <h3 class="font-display font-bold text-[0.95rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                    {comic.data.title}
+                  </h3>
+                  {comic.data.summary && (
+                    <p class="font-ui text-[0.75rem] text-kohl-500 line-clamp-2">{comic.data.summary}</p>
+                  )}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  )}
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §7 RECENT STORIES — newspaper table
+       3px category-color left bar + hairline rows
+  ══════════════════════════════════════════════ -->
+  {recentStories.length > 0 && (
+    <section id="recent" class="py-12 md:py-16" aria-label="Recent Stories">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+        <SectionHeader
+          eyebrow="RECENT · சமீபத்திய"
+          tamil="சமீபத்திய கதைகள்"
+          href="/stories/"
+        />
+
+        <ul class="divide-y divide-paper-200" role="list">
+          {recentStories.map((story) => {
+            const href   = storyRoute(story);
+            const accent = accentForKind(story.data.kind ?? '');
+            return (
+              <li class="border-b border-paper-200 last:border-b-0">
+                <a
+                  href={href}
+                  class="flex items-start gap-4 py-4 hover:bg-paper-100 -mx-4 px-4 transition-colors duration-150 group"
+                >
+                  <!-- 3px accent bar -->
+                  <div
+                    class="flex-shrink-0 w-0.5 self-stretch rounded-full mt-1"
+                    style={`background-color: var(--color-${accent})`}
+                    aria-hidden="true"
+                  ></div>
+                  <!-- Title + summary -->
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-display font-bold text-[1.0625rem] text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
+                      {story.data.title}
+                    </h3>
+                    {story.data.summary && (
+                      <p class="font-ui text-[0.8125rem] text-kohl-500 line-clamp-1">{story.data.summary}</p>
+                    )}
+                  </div>
+                  <!-- Date -->
+                  <time
+                    datetime={story.data.pubDate.toISOString()}
+                    class="font-mono text-[0.6875rem] text-paper-400 flex-shrink-0 mt-1 whitespace-nowrap"
+                  >
+                    {story.data.pubDate.toLocaleDateString('ta-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </time>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+      </div>
+    </section>
+  )}
+
+  <!-- Hairline divider -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
+
+  <!-- ══════════════════════════════════════════════
+       §8 FOR GROWN-UPS — slate box
+  ══════════════════════════════════════════════ -->
+  <section id="grownups" class="py-12 md:py-16" aria-label="For Grown-ups">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <div class="max-w-prose mx-auto text-center flex flex-col gap-4 items-center">
+
+        <p class="eyebrow">ஆசிரியர்களுக்கும் பெற்றோர்களுக்கும் · FOR GROWN-UPS</p>
+
+        <div class="p-6 rounded-2xl bg-paper-200 border border-paper-300 flex flex-col gap-3 text-left w-full">
+          <p class="font-ui text-[1.0625rem] text-slate-700 leading-relaxed">
+            Lesson plans, vocabulary guides, and parent notes — everything you need
+            to continue the story at home or in class.
+          </p>
+          <a
+            href={grownupsHref}
+            class="inline-flex items-center gap-2 font-ui font-semibold text-[0.875rem] text-slate-700 hover:text-slate-900 transition-colors self-start min-h-[44px]"
+          >
+            Browse the teacher's shelf
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       §9 ABOUT CLOSING
+  ══════════════════════════════════════════════ -->
+  <section id="about" class="py-12 md:py-16 bg-paper-200" aria-label="About NilaTales">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center flex flex-col gap-4 items-center">
+
+      <div class="border-t-2 border-kohl-300 w-24 mx-auto"></div>
+
+      <p class="font-display italic text-display text-xl md:text-2xl text-kohl-700" style="font-optical-sizing:auto">
+        "Every child deserves stories in their mother tongue."
+      </p>
+
+      <p class="font-ui text-sm text-kohl-500 leading-relaxed max-w-prose">
+        NilaTales publishes original illustrated Tamil stories for children aged 3–12.
+        We believe bedtime stories are where language lives — where a child learns not just
+        words, but wonder.
+      </p>
+
+      <a
+        href="/about/"
+        class="btn-clay-primary mt-2"
+      >
+        About NilaTales
+      </a>
+
+    </div>
+  </section>
+
+</Layout>

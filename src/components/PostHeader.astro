@@ -1,0 +1,151 @@
+---
+/**
+ * Shared post header used by StoryPost / AudioPost / ActivityPost.
+ * Renders cover image, kicker tag, title (Tamil + optional English), summary,
+ * reading meta (age, time, difficulty), and an optional moral pull-quote.
+ *
+ * The "kind" badge (moral/thirukkural/etc.) gets the category's accent color
+ * so a glance tells you where you are.
+ */
+import type { CollectionEntry } from 'astro:content';
+
+type Story = CollectionEntry<'stories'>;
+type Comic = CollectionEntry<'comics'>;
+type Audio = CollectionEntry<'audio'>;
+type Activity = CollectionEntry<'activities'>;
+type Resource = CollectionEntry<'resources'>;
+
+interface Props {
+  kind: string;                       // 'moral' | 'thirukkural' | 'panchatantra' | 'folktale' | etc.
+  kindLabel?: string;                 // override label text
+  accentColor?: string;               // tailwind color name without prefix: 'nila' | 'moon' | 'leaf' | 'rose' | 'violet' | 'sky' | 'slate'
+  title: string;
+  titleEnglish?: string;
+  subtitle?: string;
+  summary: string;
+  moral?: string;
+  ageRange?: { min: number; max: number };
+  readingTimeMin?: number;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  pubDate?: Date;
+  cover?: { src: string; width: number; height: number; alt: string };
+  coverAlt: string;
+}
+
+const {
+  kind,
+  kindLabel,
+  accentColor = 'nila',
+  title,
+  titleEnglish,
+  subtitle,
+  summary,
+  moral,
+  ageRange,
+  readingTimeMin,
+  difficulty,
+  pubDate,
+  cover,
+  coverAlt,
+} = Astro.props;
+
+const badge = kindLabel ?? kind;
+const accentBg = `bg-${accentColor}-50`;
+const accentText = `text-${accentColor}-700`;
+const accentBorder = `border-${accentColor}-200`;
+---
+
+<header class="pt-10 pb-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6">
+    <!-- Kicker -->
+    <div class="flex items-center gap-3 mb-5">
+      <span class:list={[
+        'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-display font-semibold uppercase tracking-wider',
+        accentBg, accentText,
+      ]}>
+        <span aria-hidden="true">✦</span>
+        {badge}
+      </span>
+      {pubDate && (
+        <time
+          datetime={pubDate.toISOString()}
+          class="text-xs text-slate-500 font-display"
+        >
+          {pubDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </time>
+      )}
+    </div>
+
+    <!-- Title -->
+    <h1
+      lang="ta"
+      class="text-4xl sm:text-5xl font-display font-bold text-nila-950 leading-tight text-balance mb-2"
+    >
+      {title}
+    </h1>
+    {titleEnglish && (
+      <p lang="en" class="text-lg text-slate-500 font-display italic mb-3">
+        {titleEnglish}
+      </p>
+    )}
+    {subtitle && (
+      <p lang="ta" class="text-xl text-nila-700 leading-relaxed mb-4">
+        {subtitle}
+      </p>
+    )}
+
+    <!-- Summary -->
+    <p lang="ta" class="text-lg text-slate-700 leading-relaxed mb-6 max-w-2xl">
+      {summary}
+    </p>
+
+    <!-- Meta row -->
+    {(ageRange || readingTimeMin || difficulty) && (
+      <div class="flex flex-wrap gap-2 text-xs font-display text-slate-600 mb-6">
+        {ageRange && (
+          <span class:list={['px-2.5 py-1 rounded-full border', accentBorder, 'bg-white']}>
+            🎂 வயது {ageRange.min}–{ageRange.max}
+          </span>
+        )}
+        {readingTimeMin && (
+          <span class:list={['px-2.5 py-1 rounded-full border', accentBorder, 'bg-white']}>
+            ⏱ {readingTimeMin} நிமி· read
+          </span>
+        )}
+        {difficulty && (
+          <span class:list={['px-2.5 py-1 rounded-full border', accentBorder, 'bg-white']}>
+            📖 {difficulty}
+          </span>
+        )}
+      </div>
+    )}
+
+    {moral && (
+      <blockquote
+        lang="ta"
+        class:list={[
+          'mt-6 p-5 rounded-2xl border-l-4 italic text-lg',
+          accentBorder, accentBg,
+          'text-nila-900',
+        ]}
+      >
+        <span aria-hidden="true" class="text-2xl mr-2">“</span>
+        {moral}
+        <span aria-hidden="true" class="text-2xl ml-1">”</span>
+      </blockquote>
+    )}
+  </div>
+</header>
+
+{cover && (
+  <figure class="max-w-4xl mx-auto px-4 sm:px-6 mb-12">
+    <img
+      src={cover.src}
+      width={cover.width}
+      height={cover.height}
+      alt={coverAlt}
+      loading="eager"
+      class="w-full h-auto rounded-2xl shadow-xl shadow-nila-200/40"
+    />
+  </figure>
+)}

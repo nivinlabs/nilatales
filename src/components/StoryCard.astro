@@ -1,0 +1,95 @@
+---
+/**
+ * StoryCard — used by category index pages and the homepage.
+ *
+ * Accepts any content entry with a cover + title + summary and renders a
+ * uniform card. Tone is set by `accentColor`.
+ */
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  href: string;
+  title: string;
+  titleEnglish?: string;
+  summary: string;
+  cover: ImageMetadata | string;
+  coverAlt: string;
+  badge?: string;
+  accentColor?: 'nila' | 'moon' | 'leaf' | 'rose' | 'violet' | 'sky' | 'slate';
+  readingTimeMin?: number;
+  ageRange?: { min: number; max: number };
+}
+
+const {
+  href,
+  title,
+  titleEnglish,
+  summary,
+  cover,
+  coverAlt,
+  badge,
+  accentColor = 'nila',
+  readingTimeMin,
+  ageRange,
+} = Astro.props;
+
+// Resolve cover: ImageMetadata (passed directly) vs string (legacy path)
+let coverSrc = '';
+let coverW = 800;
+let coverH = 450;
+if (typeof cover === 'string') {
+  coverSrc = cover;
+} else {
+  const opt = await getImage({ src: cover, width: 800, format: 'webp' });
+  coverSrc = opt.src;
+  coverW = opt.attributes.width ?? 800;
+  coverH = opt.attributes.height ?? 450;
+}
+---
+
+<a
+  href={href}
+  class:list={[
+    'group block rounded-2xl overflow-hidden bg-white shadow-md hover:shadow-xl',
+    'border border-slate-100 card-lift focus-visible:ring-4',
+    `focus-visible:ring-${accentColor}-400`,
+  ]}
+>
+  <div class="aspect-video bg-slate-100 overflow-hidden">
+    <img
+      src={coverSrc}
+      width={coverW}
+      height={coverH}
+      alt={coverAlt}
+      loading="lazy"
+      class="w-full h-full object-cover transition-transform group-hover:scale-105"
+    />
+  </div>
+  <div class="p-5">
+    {badge && (
+      <div class:list={[
+        'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-display font-semibold uppercase tracking-wider mb-2',
+        `bg-${accentColor}-50 text-${accentColor}-700`,
+      ]}>
+        {badge}
+      </div>
+    )}
+    <h3
+      lang="ta"
+      class="text-lg font-display font-bold text-nila-950 leading-snug group-hover:text-nila-700 transition"
+    >
+      {title}
+    </h3>
+    {titleEnglish && (
+      <p lang="en" class="text-sm text-slate-500 italic mt-0.5">{titleEnglish}</p>
+    )}
+    <p lang="ta" class="mt-2 text-sm text-slate-700 line-clamp-3">{summary}</p>
+    {(readingTimeMin || ageRange) && (
+      <div class="mt-3 flex gap-2 text-xs font-display text-slate-500">
+        {ageRange && <span>🎂 {ageRange.min}–{ageRange.max}</span>}
+        {readingTimeMin && <span>⏱ {readingTimeMin} min</span>}
+      </div>
+    )}
+  </div>
+</a>

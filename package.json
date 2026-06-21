@@ -1,0 +1,30 @@
+{
+  "name": "nilatales",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "நிலா கதைகள் · NilaTales — Illustrated Tamil storytelling site for children (ages 6–12). Moon-tales, moral stories, Thirukkural, Panchatantra, comics, lullabies, and printable activities.",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0 --port 4321",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^6.0.3",
+    "@astrojs/react": "^5.0.7",
+    "@tailwindcss/postcss": "^4.3.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.4.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tailwindcss": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0"
+  }
+}

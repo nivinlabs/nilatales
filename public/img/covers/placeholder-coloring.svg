@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <g fill="none" stroke="#0c4a6e" stroke-width="4">
+    <circle cx="800" cy="400" r="220"/>
+    <path d="M 580 600 Q 800 760 1020 600" stroke-width="6"/>
+    <circle cx="730" cy="370" r="14"/>
+    <circle cx="870" cy="370" r="14"/>
+    <path d="M 720 460 Q 800 510 880 460"/>
+  </g>
+  <text x="800" y="780" text-anchor="middle" fill="#0c4a6e" font-family="serif" font-size="32" font-weight="700">வர்ணம் தீட்டு · Coloring Page</text>
+</svg>

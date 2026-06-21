@@ -1,0 +1,59 @@
+---
+/**
+ * Footer — three columns: brand blurb, sitemap, social/colophon.
+ * Quiet by design (TAXONOMY.md §1 — grown-ups link here, not in hero).
+ */
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-20 border-t border-nila-100 bg-white/60">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Brand -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-2xl moon-sparkle" aria-hidden="true">🌙</span>
+          <span class="font-display font-bold text-lg text-nila-900">நிலா கதைகள்</span>
+        </div>
+        <p class="text-sm text-slate-600 leading-relaxed" lang="en">
+          Moon-tales — illustrated Tamil storytelling for children. Thirukkural,
+          Panchatantra, moral stories, comics, and lullabies, all in one quiet
+          place.
+        </p>
+      </div>
+
+      <!-- Sitemap -->
+      <nav aria-label="Sitemap" class="text-sm">
+        <h2 class="font-display font-semibold text-nila-900 mb-3">Explore</h2>
+        <ul class="space-y-2">
+          <li><a href="/stories/"     class="text-slate-600 hover:text-nila-700">கதைகள் · Moral Stories</a></li>
+          <li><a href="/kural/"       class="text-slate-600 hover:text-nila-700">திருக்குறள் · Thirukkural</a></li>
+          <li><a href="/panchatantra/" class="text-slate-600 hover:text-nila-700">பஞ்சதந்திரம் · Panchatantra</a></li>
+          <li><a href="/comics/"      class="text-slate-600 hover:text-nila-700">நகைச்சுவை · Comics</a></li>
+          <li><a href="/listen/"      class="text-slate-600 hover:text-nila-700">பாடல்கள் · Listen</a></li>
+          <li><a href="/activities/"  class="text-slate-600 hover:text-nila-700">செயல்பாடுகள் · Activities</a></li>
+        </ul>
+      </nav>
+
+      <!-- Grown-ups + about -->
+      <nav aria-label="Grown-ups" class="text-sm">
+        <h2 class="font-display font-semibold text-nila-900 mb-3">For grown-ups</h2>
+        <ul class="space-y-2">
+          <li><a href="/grownups/" class="text-slate-600 hover:text-slate-800">ஆசிரியர் & பெற்றோர் · Teacher guides</a></li>
+          <li><a href="/about" class="text-slate-600 hover:text-slate-800">About NilaTales</a></li>
+          <li><a href="https://github.com/nivinlabs/nilatales" class="text-slate-600 hover:text-slate-800">GitHub</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-nila-100 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-slate-500">
+      <p lang="en">© {year} NilaTales · Made with care under the moon.</p>
+      <p lang="en">
+        A sister site of
+        <a href="https://nitvi.kingspath.in" class="hover:text-nila-700 underline">NitviTalks</a>
+        · part of the Kingspath family.
+      </p>
+    </div>
+  </div>
+</footer>

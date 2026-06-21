@@ -1,0 +1,176 @@
+---
+/**
+ * ActivityPost — printable coloring page / worksheet / craft.
+ *
+ * Redesigned per DESIGN.md §6 Post page (Activity) + §20:
+ *   - clay-comic PDF download card with Lucide FileText
+ *   - Sky palette header
+ *   - Materials list in paper-100 card
+ */
+import Layout from './Layout.astro';
+import { resolveCover, idBasename } from '../utils/content';
+import { getEntry, type CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'activities'>;
+}
+
+const { post } = Astro.props;
+const data = post.data;
+
+// Resolve linked story
+const linkedStory = data.linkedStory ? await getEntry(data.linkedStory) : null;
+
+const previewMetaRaw = await resolveCover(data.previewImage, { width: 1200 });
+const previewMeta = previewMetaRaw
+  ? { ...previewMetaRaw, alt: data.titleEnglish ?? data.title }
+  : null;
+
+const kindBadge: Record<string, string> = {
+  coloring:  '🖍️ வர்ணம் · Coloring',
+  worksheet: '📝 பணித்தாள் · Worksheet',
+  craft:     '✂️ கைவினை · Craft',
+};
+---
+
+<Layout
+  title={data.title}
+  description={data.instructions?.slice(0, 160) ?? data.title}
+  lang="ta"
+>
+  <!-- ── Header ──────────────────────────── -->
+  <header class="pt-10 pb-6 bg-paper-200 border-b border-paper-300">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6">
+
+      <!-- Kind badge -->
+      <span class="cat-pill cat-pill-sky mb-4">{kindBadge[data.kind] ?? data.kind}</span>
+
+      <!-- Title -->
+      <h1 lang="ta" class="font-display text-display font-black text-[2rem] md:text-3xl text-kohl-900 leading-tight" style="font-optical-sizing:auto">
+        {data.title}
+      </h1>
+      {data.titleEnglish && (
+        <p lang="en" class="font-display italic text-lg font-light text-kohl-500 mt-2">
+          {data.titleEnglish}
+        </p>
+      )}
+
+      <!-- Meta -->
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        {data.ageRange && (
+          <span class="chip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            வயது {data.ageRange.min}–{data.ageRange.max}
+          </span>
+        )}
+        {data.durationMin && (
+          <span class="chip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            {data.durationMin} min
+          </span>
+        )}
+        {data.difficulty && (
+          <span class="chip">{data.difficulty}</span>
+        )}
+      </div>
+
+      <!-- Linked story -->
+      {linkedStory && (
+        <p class="mt-3 font-ui text-sm text-kohl-500">
+          <span class="eyebrow">FOR THE STORY</span>
+          <a
+            href={`/stories/${idBasename(linkedStory)}/`}
+            class="ml-1 font-display font-semibold text-twilight-500 hover:text-twilight-700 transition-colors"
+          >
+            {linkedStory.data.title}
+          </a>
+        </p>
+      )}
+    </div>
+  </header>
+
+  <!-- ── Body ───────────────────────────── -->
+  <article class="max-w-2xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+
+    <!-- Preview image -->
+    {previewMeta && previewMeta.src && (
+      <figure class="mb-8 rounded-2xl overflow-hidden border border-paper-200 bg-paper-100">
+        <img
+          src={previewMeta.src}
+          width={previewMeta.width}
+          height={previewMeta.height}
+          alt={previewMeta.alt}
+          class="w-full h-auto"
+          loading="lazy"
+        />
+      </figure>
+    )}
+
+    <!-- PDF download — clay-comic card -->
+    {data.pdf && (
+      <div class="p-6 rounded-3xl bg-paper-50 border border-paper-200 clay-comic flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <!-- FileText icon (Lucide inline SVG) -->
+          <div class="w-14 h-14 rounded-2xl bg-sky-100 flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-sky)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-display font-bold text-[1rem] text-kohl-700">Ready to print</p>
+            <p class="font-ui text-sm text-kohl-500">PDF · A4 format</p>
+          </div>
+        </div>
+        <a
+          href={data.pdf}
+          download
+          class="flex items-center gap-2 px-6 py-3 rounded-full bg-twilight-500 text-white font-ui font-semibold text-sm hover:bg-twilight-700 transition-colors flex-shrink-0"
+        >
+          <!-- Download icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          Download PDF
+        </a>
+      </div>
+    )}
+
+    <!-- Materials list -->
+    {data.materials?.length > 0 && (
+      <section>
+        <h2 class="font-display font-bold text-[1.0625rem] text-kohl-700 mb-4">
+          பொருட்கள் · Materials
+        </h2>
+        <ul class="flex flex-wrap gap-2">
+          {data.materials.map((m: string) => (
+            <li class="px-3 py-1.5 rounded-full bg-paper-100 border border-paper-200 font-ui text-sm text-kohl-700">
+              {m}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- Instructions -->
+    <section>
+      <h2 class="font-display font-bold text-[1.0625rem] text-kohl-700 mb-4">
+        செய்முறை · Instructions
+      </h2>
+      {data.instructionsEnglish && (
+        <details class="mb-4">
+          <summary class="font-ui text-sm font-medium text-kohl-500 cursor-pointer hover:text-kohl-700 transition-colors">
+            English instructions
+          </summary>
+          <p lang="en" class="mt-2 font-ui text-sm text-kohl-500 whitespace-pre-line leading-relaxed">
+            {data.instructionsEnglish}
+          </p>
+        </details>
+      )}
+      <div class="prose-ta p-6 rounded-2xl bg-paper-100 border border-paper-200">
+        <slot />
+      </div>
+    </section>
+
+  </article>
+</Layout>

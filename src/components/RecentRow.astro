@@ -1,0 +1,60 @@
+---
+/**
+ * RecentRow.astro — newspaper-style story row with category-color left bar.
+ *
+ * Usage:
+ *   <RecentRow
+ *     category="leaf"
+ *     title="..."
+ *     dek="..."
+ *     pubDate={new Date()}
+ *     href="/stories/..."
+ *   />
+ *
+ * DESIGN.md §6 Recent Stories.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { storyRoute } from '../utils/content';
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+  accent?: 'leaf' | 'amber' | 'moss' | 'rose' | 'violet' | 'sky' | 'slate';
+}
+const { story, accent = 'leaf' } = Astro.props;
+const data = story.data;
+const href = storyRoute(story);
+const accentClass = `row-accent-${accent}`;
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('ta-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+---
+<li class="border-b border-paper-300 last:border-b-0">
+  <a
+    href={href}
+    class="flex items-start gap-4 py-4 hover:bg-paper-100 transition-colors duration-150 -mx-4 px-4 group"
+  >
+    <!-- Category color bar -->
+    <div class:list={['flex-shrink-0 w-0.5 self-stretch rounded-full mt-1', `bg-${accent}`]}
+         style={`background-color: var(--color-${accent})`}
+         aria-hidden="true"></div>
+
+    <!-- Title + dek -->
+    <div class="flex-1 min-w-0">
+      <h3 class="font-display font-bold text-[1.125rem] text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
+        {data.title}
+      </h3>
+      {data.subtitle && (
+        <p class="font-ui text-sm text-kohl-500 line-clamp-1">{data.subtitle}</p>
+      )}
+    </div>
+
+    <!-- Date -->
+    <time
+      datetime={data.pubDate.toISOString()}
+      class="font-mono text-[0.6875rem] text-paper-400 flex-shrink-0 mt-1 whitespace-nowrap"
+    >
+      {formatDate(data.pubDate)}
+    </time>
+  </a>
+</li>

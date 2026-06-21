@@ -1,0 +1,38 @@
+---
+/**
+ * PlayButton.astro — circular clay audio play button.
+ *
+ * Usage:
+ *   <PlayButton size={56} label="Play story" />
+ *   <PlayButton size={80} label="Play" />
+ *
+ * Uses Lucide play SVG (no emoji). Clay raised.
+ * DESIGN.md §6 Listen strip.
+ */
+interface Props {
+  size?: 56 | 80;
+  label: string;
+  class?: string;
+}
+const { size = 56, label, class: extra = '' } = Astro.props;
+---
+<button
+  type="button"
+  class:list={['btn-play flex items-center justify-center flex-shrink-0 rounded-full', extra]}
+  style={`width:${size}px;height:${size}px`}
+  aria-label={label}
+>
+  <!-- Play triangle — Lucide play icon, centered manually -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size * 0.4}
+    height={size * 0.4}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="none"
+    aria-hidden="true"
+    style="margin-left:2px"
+  >
+    <path d="M5 3l14 9-14 9V3z"/>
+  </svg>
+</button>

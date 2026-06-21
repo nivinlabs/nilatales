@@ -1,0 +1,79 @@
+---
+/**
+ * /panchatantra/ — Panchatantra Tales index, grouped by tantra.
+ */
+import Layout from '../../layouts/Layout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import { publishedStories, storyRoute } from '../../utils/content';
+
+const all = await publishedStories();
+const fables = all.filter((s) => s.data.kind === 'panchatantra');
+
+const tantraNames: Record<string, { tamil: string; english: string }> = {
+  mithrabheda:     { tamil: 'மித்ரபேதம்',     english: 'Loss of Friends' },
+  mithraLaapa:     { tamil: 'மித்ரலாபம்',     english: 'Gaining Friends' },
+  kaakolookiyam:   { tamil: 'காகோலூகியம்',   english: 'Crows & Owls' },
+  labdhapraNasham: { tamil: 'லப்தப்ரணாமம்',  english: 'Loss of Gains' },
+  apadhitthudai:   { tamil: 'அபதித்யுதம்',   english: 'Ill-considered Action' },
+};
+
+const byTantra: Record<string, typeof fables> = {};
+for (const f of fables) {
+  const t = f.data.source?.kind === 'panchatantra' ? f.data.source.panchatantra.tantra : 'other';
+  if (!byTantra[t]) byTantra[t] = [];
+  byTantra[t].push(f);
+}
+---
+
+<Layout
+  title="பஞ்சதந்திர கதைகள் · Panchatantra Tales"
+  description="Classic animal fables from the Panchatantra — five tantras of nested wisdom stories."
+  lang="ta"
+>
+  <CategoryHeader
+    emoji="🦊"
+    tamil="பஞ்சதந்திர கதைகள்"
+    english="Panchatantra Tales"
+    description="Five tantras (தந்திரங்கள்) of animal fables, each containing nested stories. Lions, crows, owls, doves, and jackals teach cunning, friendship, and the consequences of action."
+    accentColor="leaf"
+    count={fables.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {fables.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        பஞ்சதந்திரக் கதைகள் விரைவில் வரும் · Panchatantra tales coming soon.
+      </p>
+    ) : (
+      Object.entries(byTantra).map(([tantra, list]) => (
+        list.length > 0 && (
+          <div class="mb-12">
+            <h2 class="text-2xl font-display font-bold text-nila-950 mb-1">
+              தந்திரம்: {tantraNames[tantra]?.tamil ?? tantra}
+            </h2>
+            <p lang="en" class="text-sm text-slate-500 font-display italic mb-5">
+              {tantraNames[tantra]?.english ?? ''} · {list.length} fable{list.length === 1 ? '' : 's'}
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {list.map((s) => (
+                <StoryCard
+                  href={storyRoute(s)}
+                  title={s.data.title}
+                  titleEnglish={s.data.titleEnglish}
+                  summary={s.data.summary}
+                  cover={s.data.cover}
+                  coverAlt={s.data.coverAlt}
+                  badge="பஞ்சதந்திரம்"
+                  accentColor="leaf"
+                  readingTimeMin={s.data.readingTimeMin}
+                  ageRange={s.data.ageRange}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      ))
+    )}
+  </section>
+</Layout>

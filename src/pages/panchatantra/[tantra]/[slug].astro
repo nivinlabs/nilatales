@@ -1,0 +1,40 @@
+---
+/**
+ * Canonical route for a single Panchatantra fable:
+ * /panchatantra/<tantra>/<slug>/
+ */
+import StoryPost from '../../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection(
+    'stories',
+    ({ data }) => data.kind === 'panchatantra' && data.draft === false,
+  );
+  return stories
+    .filter((s) => s.data.source?.kind === 'panchatantra')
+    .map((story) => {
+      const p = story.data.source!.kind === 'panchatantra'
+        ? story.data.source.panchatantra
+        : null;
+      if (!p) return null;
+      return {
+        params: { tantra: p.tantra, slug: idBasename(story) },
+        props: { story },
+      };
+    })
+    .filter((x): x is { params: { tantra: string; slug: string }; props: { story: CollectionEntry<'stories'> } } => x !== null);
+}
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story}>
+  <Content />
+</StoryPost>

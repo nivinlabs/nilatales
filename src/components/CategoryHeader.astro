@@ -1,0 +1,33 @@
+---
+/**
+ * CategoryHeader — reusable colored header for /stories/, /kural/, etc.
+ */
+interface Props {
+  emoji: string;
+  tamil: string;
+  english: string;
+  description: string;
+  accentColor: 'nila' | 'moon' | 'leaf' | 'rose' | 'violet' | 'sky' | 'slate';
+  count: number;
+}
+
+const { emoji, tamil, english, description, accentColor, count } = Astro.props;
+const bg = `bg-${accentColor}-50`;
+const border = `border-${accentColor}-200`;
+---
+
+<header class={`py-12 ${bg} border-b ${border}`}>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center gap-4 mb-3">
+      <span class="text-5xl" aria-hidden="true">{emoji}</span>
+      <div>
+        <h1 lang="ta" class="text-3xl sm:text-4xl font-display font-bold text-nila-950">{tamil}</h1>
+        <p lang="en" class="text-base text-slate-500 font-display italic">{english}</p>
+      </div>
+    </div>
+    <p lang="ta" class="mt-3 text-lg text-nila-900 max-w-3xl leading-relaxed">{description}</p>
+    <p class="mt-3 text-sm font-display text-slate-500">
+      {count} {count === 1 ? 'story' : 'stories'}
+    </p>
+  </div>
+</header>

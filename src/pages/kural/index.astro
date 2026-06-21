@@ -1,0 +1,79 @@
+---
+/**
+ * /kural/ — Thirukkural Tales index.
+ * Group by paal (aram / porul / inbam), then by adhigaaram.
+ */
+import Layout from '../../layouts/Layout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import { publishedStories, storyRoute } from '../../utils/content';
+
+const all = await publishedStories();
+const kurals = all.filter((s) => s.data.kind === 'thirukkural');
+
+// Group by paal
+const byPaal: Record<string, typeof kurals> = { aram: [], porul: [], inbam: [] };
+for (const k of kurals) {
+  const paal = k.data.source?.kind === 'thirukkural' ? k.data.source.kural.paal : 'aram';
+  if (!byPaal[paal]) byPaal[paal] = [];
+  byPaal[paal].push(k);
+}
+
+const paalNames: Record<string, { tamil: string; english: string }> = {
+  aram:   { tamil: 'அறம்',   english: 'Virtue' },
+  porul:  { tamil: 'பொருள்', english: 'Wealth' },
+  inbam:  { tamil: 'இன்பம்', english: 'Love' },
+};
+---
+
+<Layout
+  title="திருக்குறள் கதைகள் · Thirukkural Tales"
+  description="Valluvar's 1330 couplets, each retold as a short illustrated Tamil story for children."
+  lang="ta"
+>
+  <CategoryHeader
+    emoji="📜"
+    tamil="திருக்குறள் கதைகள்"
+    english="Thirukkural Tales"
+    description="Valluvar's 1330 couplets, one short story at a time. Each couplet in Tamil script, transliteration, meaning, and a tale that brings it to life."
+    accentColor="moon"
+    count={kurals.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {kurals.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        குறள் கதைகள் விரைவில் வரும் · Thirukkural tales coming soon.
+      </p>
+    ) : (
+      Object.entries(byPaal).map(([paal, list]) => (
+        list.length > 0 && (
+          <div class="mb-12">
+            <h2 class="text-2xl font-display font-bold text-nila-950 mb-1">
+              பால்: {paalNames[paal]?.tamil ?? paal}
+            </h2>
+            <p lang="en" class="text-sm text-slate-500 font-display italic mb-5">
+              {paalNames[paal]?.english ?? ''} · {list.length} couplet{list.length === 1 ? '' : 's'}
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {list.map((s) => (
+                <StoryCard
+                  href={storyRoute(s)}
+                  title={s.data.title}
+                  titleEnglish={s.data.titleEnglish}
+                  summary={s.data.summary}
+                  cover={s.data.cover}
+                  coverAlt={s.data.coverAlt}
+                  badge={`குறள் #${s.data.source?.kind === 'thirukkural' ? s.data.source.kural.number : ''}`}
+                  accentColor="moon"
+                  readingTimeMin={s.data.readingTimeMin}
+                  ageRange={s.data.ageRange}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      ))
+    )}
+  </section>
+</Layout>

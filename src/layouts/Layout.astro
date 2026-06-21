@@ -1,0 +1,106 @@
+---
+/**
+ * Base layout for every NilaTales page.
+ * Sets <html lang>, loads global styles (Tailwind v4 + design tokens), renders
+ * Masthead + Nav + Colophon.
+ *
+ * `lang` should be 'ta' for Tamil-first pages, 'ta-en' for bilingual.
+ *
+ * DESIGN.md §6 — Layout + Masthead + Nav + Colophon.
+ */
+import '../styles/global.css';
+import Masthead from '../components/Masthead.astro';
+import Nav from '../components/Nav.astro';
+import Colophon from '../components/Colophon.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: 'ta' | 'ta-en' | 'en';
+  ogImage?: string;
+  canonical?: string;
+  bodyClass?: string;
+  showMasthead?: boolean;
+}
+
+const {
+  title,
+  description = 'நிலா கதைகள் · NilaTales — Illustrated Tamil storytelling for children.',
+  lang = 'ta',
+  ogImage = '/img/og-default.jpg',
+  canonical,
+  bodyClass = '',
+  showMasthead = true,
+} = Astro.props;
+
+const fullTitle = title.includes('NilaTales') ? title : `${title} · நிலா கதைகள்`;
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'https://nilatales.com').toString();
+---
+
+<!doctype html>
+<html lang={lang === 'ta-en' ? 'ta' : lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(ogImage, Astro.site ?? 'https://nilatales.com').toString()} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content="NilaTales" />
+    <meta property="og:locale" content="ta_IN" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <!-- Fraunces (display serif) + JetBrains Mono (editorial chrome) — above the fold -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+
+    <!-- Noto Tamil fonts (fallback for Tamil) -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Serif+Tamil:wght@400;500;600;700&display=swap"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+
+  <body class:list={['min-h-screen flex flex-col', bodyClass]}>
+    <!-- Skip to content -->
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-paper-50 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-twilight-500 focus:outline-none"
+    >
+      Skip to content
+    </a>
+
+    <!-- Newspaper masthead (nameplate + date + Vol/Issue) -->
+    {showMasthead && <Masthead />}
+
+    <!-- Sticky navigation -->
+    <Nav />
+
+    <!-- Page content -->
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <!-- Footer colophon -->
+    <Colophon />
+  </body>
+</html>

@@ -1,0 +1,168 @@
+---
+/**
+ * ResourcePost — for the hidden /grownups/ route.
+ * Renders teacher-guide / parent-note / glossary entries. Branded slate
+ * (the "grown-ups" accent color, per TAXONOMY.md §1).
+ */
+import Layout from './Layout.astro';
+import { getEntry, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../utils/content';
+
+interface Props {
+  post: CollectionEntry<'resources'>;
+}
+
+const { post } = Astro.props;
+const data = post.data;
+
+// Astro 6: reference() returns {id, collection} — must explicitly resolve.
+const linkedStory = data.linkedStory ? await getEntry(data.linkedStory) : null;
+
+const kindBadge = {
+  'teacher-guide': '👩‍🏫 Teacher Guide',
+  'parent-note':   '👪 Parent Note',
+  'glossary':      '📖 Glossary',
+}[data.kind];
+---
+
+<Layout
+  title={data.title}
+  description={data.summary}
+  lang="ta"
+>
+  <header class="pt-10 pb-6 bg-slate-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-display font-semibold uppercase tracking-wider bg-slate-200 text-slate-700 mb-4">
+        {kindBadge}
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-display font-bold text-nila-950 leading-tight">
+        {data.title}
+      </h1>
+      <p class="mt-4 text-base text-slate-700 leading-relaxed">{data.summary}</p>
+      <p class="mt-3 text-sm font-display text-slate-500">
+        🎂 வயது {data.ageRange.min}–{data.ageRange.max}
+      </p>
+      {linkedStory && (
+        <p class="mt-2 text-sm text-slate-600">
+          For the story:
+          <a href={`/stories/${idBasename(linkedStory)}/`} class="ml-1 text-nila-700 font-display font-semibold hover:underline">
+            {linkedStory.data.title}
+          </a>
+        </p>
+      )}
+    </div>
+  </header>
+
+  <article class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+    {data.kind === 'teacher-guide' && (
+      <div class="space-y-8">
+        {data.objectives.length > 0 && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">🎯 நோக்கங்கள் · Objectives</h2>
+            <ul class="list-disc list-inside space-y-1 text-slate-700 prose-ta">
+              {data.objectives.map((o) => <li>{o}</li>)}
+            </ul>
+          </section>
+        )}
+        {data.vocabulary.length > 0 && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">📚 சொல்வளம் · Vocabulary</h2>
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left border-b border-slate-200 text-slate-600 font-display">
+                  <th class="py-2">Tamil</th>
+                  <th class="py-2">English</th>
+                  <th class="py-2">Translit.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.vocabulary.map((v) => (
+                  <tr class="border-b border-slate-100">
+                    <td lang="ta" class="py-2 text-nila-900">{v.tamil}</td>
+                    <td lang="en" class="py-2 text-slate-700">{v.english}</td>
+                    <td lang="en" class="py-2 text-slate-500 italic">{v.transliteration ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        )}
+        {data.preReading && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">🔍 Pre-reading</h2>
+            <p class="prose-ta text-slate-700">{data.preReading}</p>
+          </section>
+        )}
+        {data.discussion.length > 0 && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">💬 Discussion</h2>
+            <ul class="list-decimal list-inside space-y-2 prose-ta text-slate-700">
+              {data.discussion.map((d) => <li>{d}</li>)}
+            </ul>
+          </section>
+        )}
+        {data.extensionActivity && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">🌱 Extension</h2>
+            <p class="prose-ta text-slate-700">{data.extensionActivity}</p>
+          </section>
+        )}
+        {data.assessment && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">✅ Assessment</h2>
+            <p class="prose-ta text-slate-700">{data.assessment}</p>
+          </section>
+        )}
+      </div>
+    )}
+
+    {data.kind === 'parent-note' && (
+      <div class="space-y-6">
+        {data.readingTips.length > 0 && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">📖 Reading tips</h2>
+            <ul class="list-disc list-inside space-y-1 prose-ta text-slate-700">
+              {data.readingTips.map((t) => <li>{t}</li>)}
+            </ul>
+          </section>
+        )}
+        {data.conversationPrompts.length > 0 && (
+          <section>
+            <h2 class="font-display font-semibold text-nila-900 mb-2">💬 Conversation prompts</h2>
+            <ul class="list-disc list-inside space-y-1 prose-ta text-slate-700">
+              {data.conversationPrompts.map((p) => <li>{p}</li>)}
+            </ul>
+          </section>
+        )}
+      </div>
+    )}
+
+    {data.kind === 'glossary' && data.vocabulary.length > 0 && (
+      <section>
+        <h2 class="font-display font-semibold text-nila-900 mb-2">📚 சொல்வளம் · Glossary</h2>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left border-b border-slate-200 text-slate-600 font-display">
+              <th class="py-2">Tamil</th>
+              <th class="py-2">English</th>
+              <th class="py-2">Translit.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.vocabulary.map((v) => (
+              <tr class="border-b border-slate-100">
+                <td lang="ta" class="py-2 text-nila-900">{v.tamil}</td>
+                <td lang="en" class="py-2 text-slate-700">{v.english}</td>
+                <td lang="en" class="py-2 text-slate-500 italic">{v.transliteration ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    )}
+
+    <div class="prose-ta mt-8">
+      <slot />
+    </div>
+  </article>
+</Layout>

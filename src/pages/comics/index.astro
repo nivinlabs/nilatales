@@ -1,0 +1,52 @@
+---
+/**
+ * /comics/ — Comic strips, one-shots, and serials.
+ */
+import Layout from '../../layouts/Layout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import { publishedComics } from '../../utils/content';
+import { idBasename } from '../../utils/content';
+
+const comics = await publishedComics();
+---
+
+<Layout
+  title="நகைச்சுவை · Comics"
+  description="Illustrated Tamil comics for children — strips, one-shots, and serials."
+  lang="ta"
+>
+  <CategoryHeader
+    emoji="🎨"
+    tamil="நகைச்சுவை"
+    english="Comics"
+    description="Page-by-page illustrated comics in Tamil — silly, mischievous, school-life, and family stories, with a built-in reader for desktop and mobile."
+    accentColor="rose"
+    count={comics.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {comics.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        நகைச்சுவைகள் விரைவில் வரும் · Comics coming soon.
+      </p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {comics.map((c) => (
+          <StoryCard
+            href={`/comics/${idBasename(c)}/`}
+            title={c.data.title}
+            titleEnglish={c.data.titleEnglish}
+            summary={c.data.summary}
+            cover={c.data.cover}
+            coverAlt={c.data.coverAlt}
+            badge={`Comic · ${c.data.format}`}
+            accentColor="rose"
+            readingTimeMin={c.data.readingTimeMin}
+            ageRange={c.data.ageRange}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

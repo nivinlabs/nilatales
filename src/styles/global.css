@@ -1,0 +1,357 @@
+/* NilaTales — global styles
+ *
+ * Tailwind v4 (single @import, @theme-driven).
+ * Design spec: DESIGN.md §2–§5.
+ *
+ * Load order:
+ *   1. Google Fonts (preconnect + stylesheet — must precede @import 'tailwindcss')
+ *   2. @import 'tailwindcss'  ← loads Tailwind v4
+ *   3. @theme  ← Tailwind v4 design tokens (our palette, shadows, radii)
+ *   4. Base resets + body
+ *   5. Claymorphism shadow recipes (CSS variables, performance-gated)
+ *   6. Newspaper rule utilities
+ *   7. Component utilities
+ *   8. Accessibility
+ */
+
+/* ─── 1. Fonts ────────────────────────────────────────────────────────────── */
+/*
+ * Google Fonts are loaded in Layout.astro <head> — do NOT put <link> tags here.
+ * @import the stylesheet URL so browsers load it (won't double-fetch if already in <head>).
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@import 'tailwindcss';
+
+/* ─── 2. Design tokens ──────────────────────────────────────────────────── */
+
+@theme {
+  /* ── Paper (newsprint warm neutrals) ─────────────────────────── */
+  --color-paper-50:  #FAF7F0;
+  --color-paper-100: #F4EFE3;
+  --color-paper-200: #ECE5D3;
+  --color-paper-300: #D8CFBA;
+  --color-paper-400: #B5A98A;
+  --color-paper-ink: #1B1B1F;   /* warm ink, not pure black */
+
+  /* ── Kohl (deep type / ink accents) ──────────────────────────── */
+  --color-kohl-300: #6E6878;
+  --color-kohl-500: #3F3B47;
+  --color-kohl-700: #28252E;
+  --color-kohl-900: #15131A;
+
+  /* ── Twilight (brand accent — moonlit violet) ────────────────── */
+  --color-twilight-50:  #F1EDFA;
+  --color-twilight-300: #C8BEE0;
+  --color-twilight-500: #6B4FB8;
+  --color-twilight-700: #3F2D87;
+
+  /* ── Section category accents (one per pillar) ───────────────── */
+  --color-leaf:   #4F8A4F;   /* Moral / Folktale     */
+  --color-amber:  #C28A2A;   /* Thirukkural          */
+  --color-moss:   #5C7045;   /* Panchatantra         */
+  --color-rose:   #B85C7C;   /* Comics               */
+  --color-violet: #7C5BC4;   /* Listen / Lullaby     */
+  --color-sky:    #4A82B5;   /* Activities           */
+  --color-slate:  #475569;   /* Grown-ups            */
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --font-display: 'Fraunces', 'Noto Serif Tamil', Georgia, serif;
+  --font-ui:      'Inter', 'Noto Sans Tamil', system-ui, sans-serif;
+  --font-serif-ta: 'Noto Serif Tamil', 'Latha', 'Tamil Sangam MN', serif;
+  --font-sans-ta:  'Noto Sans Tamil', 'Latha', 'Tamil Sangam MN', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Radius scale (4 levels, per claymorphism design spec) ───── */
+  --radius-sm:  0.75rem;   /* 12px — chips, small badges */
+  --radius-md:  1.25rem;   /* 20px — cards, nav pills */
+  --radius-lg:  1.75rem;   /* 28px — comic cards */
+  --radius-xl:  2rem;      /* 32px — loudest clay (comics strip) */
+
+  /* ── Claymorphism shadow recipes (CSS variables, gated in §5) ── */
+  /*    --clay-card     — image cards, small tiles                  */
+  /*    --clay-raised   — buttons, active tiles                    */
+  /*    --clay-comic    — LOUDEST cards (comics strip only)        */
+  /*    --clay-pressed  — active/pressed state                      */
+  --clay-card:   inset -2px -2px 6px rgba(255, 255, 255, 0.7),  4px 4px 12px rgba(60, 50, 90, 0.12);
+  --clay-raised: inset -3px -3px 8px rgba(255, 255, 255, 0.8),  6px 6px 16px rgba(60, 50, 90, 0.15);
+  --clay-comic:  inset -3px -3px 10px rgba(255, 255, 255, 0.9), inset 2px 2px 6px rgba(0, 0, 0, 0.05), 8px 8px 24px rgba(60, 50, 90, 0.18);
+  --clay-pressed:inset 3px 3px 8px rgba(60, 50, 90, 0.15),       inset -1px -1px 4px rgba(255, 255, 255, 0.5);
+
+  /* ── Newspaper rules ──────────────────────────────────────────── */
+  --rule:         1px solid var(--color-paper-300);
+  --rule-strong:   2px solid var(--color-kohl-700);
+}
+
+/* ─── 3. Base ────────────────────────────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--color-paper-50);
+  color: var(--color-kohl-900);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+/* Tamil script defaults to serif; English to UI font */
+:lang(ta) { font-family: var(--font-serif-ta); }
+:lang(en) { font-family: var(--font-ui); }
+
+/* Display headings use Fraunces */
+h1, h2, h3, h4, h5, h6,
+.font-display { font-family: var(--font-display); }
+
+/* Prose body — Noto Serif Tamil, taller line-height for children */
+.prose-ta {
+  font-family: var(--font-serif-ta);
+  font-size: 1.125rem;
+  line-height: 1.85;
+  letter-spacing: 0.005em;
+  color: var(--color-kohl-900);
+}
+.prose-ta p { margin-bottom: 1.25em; }
+
+/* Display serif for large English headings */
+.text-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+
+/* ─── 4. Newspaper utilities ───────────────────────────────────────────── */
+
+/* Vol/Issue, dateline, ISSN — editorial chrome in mono */
+.font-mono-editorial {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  color: var(--color-kohl-500);
+}
+
+/* Eyebrow label — small caps mono */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;   /* 11px */
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-kohl-500);
+}
+
+/* Newspaper rule — hairline */
+.rule { border-top: var(--rule); }
+.rule-strong { border-top: var(--rule-strong); }
+
+/* 3px left bar in category accent color (newspaper table rows) */
+.row-accent-leaf   { border-left: 3px solid var(--color-leaf);   padding-left: 0.75rem; }
+.row-accent-amber  { border-left: 3px solid var(--color-amber);  padding-left: 0.75rem; }
+.row-accent-moss   { border-left: 3px solid var(--color-moss);   padding-left: 0.75rem; }
+.row-accent-rose   { border-left: 3px solid var(--color-rose);   padding-left: 0.75rem; }
+.row-accent-violet { border-left: 3px solid var(--color-violet); padding-left: 0.75rem; }
+.row-accent-sky    { border-left: 3px solid var(--color-sky);    padding-left: 0.75rem; }
+.row-accent-slate  { border-left: 3px solid var(--color-slate);  padding-left: 0.75rem; }
+
+/* Category pill — monogram emoji + colored background */
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px; /* pill */
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+.cat-pill-leaf   { background: rgba(79, 138, 79, 0.12);  color: var(--color-leaf);   }
+.cat-pill-amber  { background: rgba(194, 138, 42, 0.12);  color: var(--color-amber);  }
+.cat-pill-moss   { background: rgba(92, 112, 69, 0.12);   color: var(--color-moss);   }
+.cat-pill-rose   { background: rgba(184, 92, 124, 0.12);  color: var(--color-rose);   }
+.cat-pill-violet { background: rgba(124, 91, 196, 0.12);  color: var(--color-violet); }
+.cat-pill-sky    { background: rgba(74, 130, 181, 0.12);  color: var(--color-sky);    }
+.cat-pill-slate  { background: rgba(71, 85, 105, 0.12);   color: var(--color-slate);  }
+
+/* ─── 5. Claymorphism — performance-gated ──────────────────────────────── */
+
+/*
+ * Clay shadows are expensive on low-powered devices. Gate them behind
+ * (min-width: 768px) AND (prefers-reduced-motion: no-preference).
+ * Mobile / reduced-motion users get a single flat shadow fallback.
+ */
+
+/* Fallback for mobile / reduced-motion — applied always */
+.clay-card,
+.clay-raised,
+.clay-comic {
+  box-shadow: 0 2px 8px rgba(60, 50, 90, 0.08);
+}
+
+/* Full clay on capable devices with motion preference */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .clay-card   { box-shadow: var(--clay-card); }
+  .clay-raised { box-shadow: var(--clay-raised); }
+  .clay-comic  { box-shadow: var(--clay-comic); }
+}
+
+/* Pressed state always works (no media query) */
+.clay-pressed { box-shadow: var(--clay-pressed); }
+
+/* Hover lift — only when clay is available */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .clay-raised:hover {
+    transform: translateY(-2px);
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease-out;
+    box-shadow: var(--clay-raised);
+  }
+  .clay-raised:active {
+    transform: translateY(0);
+    box-shadow: var(--clay-pressed);
+    transition: box-shadow 100ms ease-out;
+  }
+  .clay-comic:hover {
+    transform: translateY(-4px) rotate(-1deg) scale(1.02);
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease-out;
+    box-shadow: var(--clay-comic);
+  }
+  .clay-comic:active {
+    transform: scale(0.98);
+    box-shadow: var(--clay-pressed);
+  }
+}
+
+/* ─── 6. Clay components ────────────────────────────────────────────────── */
+
+/* Clay CTA button — primary action pill */
+.btn-clay-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 9999px;
+  background-color: var(--color-twilight-500);
+  color: white;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: var(--clay-raised);
+  cursor: pointer;
+  border: none;
+  min-height: 52px;
+  transition: background-color 150ms ease;
+}
+.btn-clay-primary:hover   { background-color: var(--color-twilight-700); }
+.btn-clay-primary:active  { background-color: var(--color-twilight-700); box-shadow: var(--clay-pressed); }
+
+/* Clay play button — circular, for audio */
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--color-twilight-500);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--clay-raised);
+  flex-shrink: 0;
+}
+.btn-play:hover   { background-color: var(--color-twilight-700); }
+.btn-play:active  { background-color: var(--color-twilight-700); box-shadow: var(--clay-pressed); }
+
+/* Play button sizes */
+.btn-play-56 { width: 56px; height: 56px; }
+.btn-play-80 { width: 80px; height: 80px; }
+
+/* ─── 7. Accessibility ──────────────────────────────────────────────────── */
+
+/* Focus ring — 2px twilight, keyboard only */
+:focus-visible {
+  outline: 2px solid var(--color-twilight-500);
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* Min 44px touch targets */
+button, a.btn, [role='button'] { min-height: 44px; }
+
+/* Reduced-motion global kill switch */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── 8. Content visibility (perf) ─────────────────────────────────────── */
+
+section[id] {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* ─── 9. Text balance / wrap ───────────────────────────────────────────── */
+
+.text-balance { text-wrap: balance; }
+.text-pretty { text-wrap: pretty; }
+
+/* ─── 10. Drop cap ──────────────────────────────────────────────────────── */
+
+.drop-cap::first-letter {
+  font-family: var(--font-serif-ta);
+  font-size: 4.5rem;     /* ~72px */
+  font-weight: 800;
+  color: var(--color-kohl-900);
+  float: left;
+  line-height: 0.8;
+  margin-right: 0.12em;
+  margin-top: 0.05em;
+  shape-outside: margin-box;
+}
+
+/* ─── 11. Age / reading-time chips ────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: var(--color-paper-200);
+  color: var(--color-kohl-500);
+}
+
+/* ─── 12. Reading progress bar ─────────────────────────────────────────── */
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-twilight-500), var(--color-violet));
+  z-index: 50;
+  pointer-events: none;
+}
+
+/* ─── 13. Scroll-snap for horizontal strips ────────────────────────────── */
+
+.scroll-snap-x {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-snap-x::-webkit-scrollbar { display: none; }
+.scroll-snap-item { scroll-snap-align: start; }

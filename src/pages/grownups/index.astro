@@ -1,0 +1,104 @@
+---
+/**
+ * /grownups/ — Resources for parents and teachers (hidden from main tile grid).
+ * Teacher guides, parent notes, glossaries.
+ */
+import Layout from '../../layouts/Layout.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import { publishedResources } from '../../utils/content';
+import { getEntry } from 'astro:content';
+import { idBasename } from '../../utils/content';
+
+const entries = await publishedResources();
+
+const guides    = entries.filter((r) => r.data.kind === 'teacher-guide');
+const parent    = entries.filter((r) => r.data.kind === 'parent-note');
+const glossary  = entries.filter((r) => r.data.kind === 'glossary');
+
+// Astro 6: reference() doesn't auto-resolve. Pre-resolve linkedStory for all.
+const linkedStoryTitles = new Map<string, string>();
+for (const r of entries) {
+  if (r.data.linkedStory && !linkedStoryTitles.has(r.data.linkedStory.id)) {
+    const e = await getEntry(r.data.linkedStory);
+    if (e) linkedStoryTitles.set(r.data.linkedStory.id, e.data.title);
+  }
+}
+---
+
+<Layout
+  title="ஆசிரியர் & பெற்றோர் · For Grown-ups"
+  description="Teacher guides, parent notes, and glossaries for every NilaTales story."
+  lang="ta"
+>
+  <CategoryHeader
+    emoji="👨‍🏫"
+    tamil="ஆசிரியர் & பெற்றோர்"
+    english="For Grown-ups"
+    description="Lesson plans, reading tips, vocabulary lists, and discussion prompts — everything a teacher or parent needs to read NilaTales with a child."
+    accentColor="slate"
+    count={entries.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-12">
+    {entries.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        வளங்கள் விரைவில் வரும் · Resources coming soon.
+      </p>
+    ) : (
+      <>
+        {guides.length > 0 && (
+          <div>
+            <h2 class="text-xl font-display font-bold text-nila-950 mb-1">👩‍🏫 ஆசிரியர் வழிகாட்டிகள் · Teacher Guides</h2>
+            <p lang="en" class="text-sm text-slate-500 font-display italic mb-4">Lesson plans with objectives, vocabulary, and discussion questions.</p>
+            <ul class="space-y-3">
+              {guides.map((r) => (
+                <li>
+                  <a href={`/grownups/${idBasename(r)}/`} class="block p-5 rounded-2xl bg-white border border-slate-100 hover:shadow-md transition">
+                    <div class="font-display font-semibold text-nila-950">{r.data.title}</div>
+                    <p class="mt-1 text-sm text-slate-700">{r.data.summary}</p>
+                    {r.data.linkedStory && (
+                      <p class="mt-2 text-xs font-display text-slate-500">
+                        For: <span lang="ta">{r.data.linkedStory ? linkedStoryTitles.get(r.data.linkedStory.id) ?? '' : ''}</span>
+                      </p>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {parent.length > 0 && (
+          <div>
+            <h2 class="text-xl font-display font-bold text-nila-950 mb-1">👪 பெற்றோர் குறிப்புகள் · Parent Notes</h2>
+            <p lang="en" class="text-sm text-slate-500 font-display italic mb-4">Reading tips and conversation prompts for home.</p>
+            <ul class="space-y-3">
+              {parent.map((r) => (
+                <li>
+                  <a href={`/grownups/${idBasename(r)}/`} class="block p-5 rounded-2xl bg-white border border-slate-100 hover:shadow-md transition">
+                    <div class="font-display font-semibold text-nila-950">{r.data.title}</div>
+                    <p class="mt-1 text-sm text-slate-700">{r.data.summary}</p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {glossary.length > 0 && (
+          <div>
+            <h2 class="text-xl font-display font-bold text-nila-950 mb-4">📖 சொல்வளம் · Glossaries</h2>
+            <ul class="space-y-3">
+              {glossary.map((r) => (
+                <li>
+                  <a href={`/grownups/${idBasename(r)}/`} class="block p-5 rounded-2xl bg-white border border-slate-100 hover:shadow-md transition">
+                    <div class="font-display font-semibold text-nila-950">{r.data.title}</div>
+                    <p class="mt-1 text-sm text-slate-700">{r.data.summary}</p>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
+    )}
+  </section>
+</Layout>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <rect width="1600" height="900" fill="#fff1f2"/>
+  <rect x="60" y="60" width="460" height="380" fill="#fecdd3" stroke="#9f1239" stroke-width="4" rx="8"/>
+  <rect x="560" y="60" width="460" height="380" fill="#ffe4e6" stroke="#9f1239" stroke-width="4" rx="8"/>
+  <rect x="1060" y="60" width="480" height="380" fill="#fecdd3" stroke="#9f1239" stroke-width="4" rx="8"/>
+  <rect x="60" y="480" width="730" height="380" fill="#ffe4e6" stroke="#9f1239" stroke-width="4" rx="8"/>
+  <rect x="830" y="480" width="710" height="380" fill="#fecdd3" stroke="#9f1239" stroke-width="4" rx="8"/>
+  <text x="800" y="430" text-anchor="middle" fill="#9f1239" font-family="serif" font-size="60" font-weight="700">🎨 நகைச்சுவை</text>
+</svg>

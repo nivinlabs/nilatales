@@ -1,0 +1,21 @@
+---
+/**
+ * CategoryPill.astro — colored monogram pill for category tiles.
+ *
+ * Usage:
+ *   <CategoryPill category="leaf" emoji="🌙">Moral</CategoryPill>
+ *
+ * DESIGN.md §6 Six Pillars.
+ */
+interface Props {
+  category: 'leaf' | 'amber' | 'moss' | 'rose' | 'violet' | 'sky' | 'slate';
+  emoji: string;
+  class?: string;
+}
+const { category, emoji, class: extra = '' } = Astro.props;
+const pillClass = `cat-pill cat-pill-${category}`;
+---
+<span class:list={[pillClass, extra]}>
+  <span aria-hidden="true">{emoji}</span>
+  <slot />
+</span>

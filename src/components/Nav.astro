@@ -1,0 +1,91 @@
+---
+/**
+ * Nav.astro — sticky editorial navbar.
+ *
+ * Restyled per DESIGN.md §7:
+ *   - Paper-100 bg with kohl-300 hairline below
+ *   - 6 category links + About + Bedtime toggle chip
+ *   - Twilight-500 for active/hover
+ *
+ * Nav items: Moral, Kural, Panchatantra, Comics, Listen, Activities
+ */
+---
+<nav
+  class="sticky top-0 z-40 bg-paper-100 border-b border-paper-300"
+  aria-label="Main navigation"
+>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between gap-2 overflow-x-auto scrollbar-hide py-2">
+
+      <!-- Category links -->
+      <ul class="flex items-center gap-1 list-none m-0 p-0" role="list">
+        {[
+          { href: '/stories/',         label: 'கதைகள்', en: 'Stories'       },
+          { href: '/kural/',           label: 'குறள்',   en: 'Kural'         },
+          { href: '/panchatantra/',    label: 'பஞ்சதந்திரம்', en: 'Panchatantra' },
+          { href: '/comics/',          label: 'நகைச்சுவை', en: 'Comics'       },
+          { href: '/listen/',          label: 'கேட்க',   en: 'Listen'        },
+          { href: '/activities/',     label: 'விளையாட்டு', en: 'Activities'  },
+        ].map(({ href, label, en }) => (
+          <li>
+            <a
+              href={href}
+              class="flex flex-col items-center px-3 py-1 rounded-lg text-[0.7rem] font-ui font-medium text-kohl-500 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[44px] justify-center whitespace-nowrap"
+              aria-label={`${label} — ${en}`}
+            >
+              <span class="font-sans-ta text-[0.75rem] leading-none">{label}</span>
+              <span class="text-[10px] text-paper-400 font-mono tracking-wider">{en}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Right side: About + Bedtime toggle -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <a
+          href="/about/"
+          class="px-3 py-1 rounded-lg text-[0.7rem] font-ui font-medium text-kohl-500 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[44px] flex items-center justify-center"
+          aria-label="About"
+        >
+          About
+        </a>
+
+        <!-- Bedtime Mode toggle chip (clay-card) -->
+        <button
+          id="bedtime-toggle"
+          type="button"
+          class="clay-card flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-50 border border-paper-300 text-[0.7rem] font-ui font-semibold text-kohl-700 hover:text-twilight-500 transition-colors duration-150 min-h-[36px]"
+          aria-label="Toggle Bedtime Mode"
+          aria-pressed="false"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span>Bedtime</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Bedtime Mode: darken page background + twilights
+  const btn = document.getElementById('bedtime-toggle');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const active = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', String(!active));
+      document.documentElement.classList.toggle('bedtime-active', !active);
+    });
+    // Optional: activate on schedule (e.g. after 7pm)
+  }
+</script>
+
+<style>
+  .bedtime-active {
+    --bg-page: #1B1B2E;
+  }
+  .bedtime-active body {
+    background-color: #1B1B2E;
+    color: #E8E0F0;
+  }
+</style>

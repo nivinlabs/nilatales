@@ -1,0 +1,47 @@
+---
+/**
+ * Canonical route for a single Thirukkural story:
+ * /kural/<adhigaaram-number>/<kural-number>/
+ *
+ * (e.g. /kural/1/1/ → Thirukkural #1, Adhigaaram #1 — அகர முதல ...)
+ *
+ * Also supports /kural/<adhigaaram>/ for browsing all kurals in one chapter.
+ */
+import StoryPost from '../../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection(
+    'stories',
+    ({ data }) => data.kind === 'thirukkural' && data.draft === false,
+  );
+
+  return stories
+    .filter((s) => s.data.source?.kind === 'thirukkural')
+    .map((story) => {
+      const kural = story.data.source!.kind === 'thirukkural'
+        ? story.data.source.kural
+        : null;
+      if (!kural) return null;
+      return {
+        params: {
+          adhigaaram: String(kural.adhigaaramNumber),
+          kural: String(kural.number),
+        },
+        props: { story },
+      };
+    })
+    .filter((x): x is { params: { adhigaaram: string; kural: string }; props: { story: CollectionEntry<'stories'> } } => x !== null);
+}
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story}>
+  <Content />
+</StoryPost>

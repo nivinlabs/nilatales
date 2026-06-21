@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="60%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="50%" cy="35%" r="20%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.8"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="1200" cy="280" r="180" fill="url(#moon)"/>
+  <circle cx="1240" cy="260" r="160" fill="#312e81"/>
+  <g fill="#fcd34d" opacity="0.7">
+    <text x="200" y="180" font-family="serif" font-size="28">✦</text>
+    <text x="380" y="120" font-family="serif" font-size="36">✦</text>
+    <text x="640" y="200" font-family="serif" font-size="24">✦</text>
+    <text x="900" y="100" font-family="serif" font-size="40">✦</text>
+    <text x="300" y="320" font-family="serif" font-size="22">✦</text>
+    <text x="780" y="380" font-family="serif" font-size="30">✦</text>
+  </g>
+  <g fill="#1e1b4b" opacity="0.9">
+    <path d="M0 720 Q 200 660 400 700 T 800 720 T 1200 700 T 1600 720 L 1600 900 L 0 900 Z"/>
+  </g>
+  <g fill="#3730a3">
+    <path d="M0 800 Q 200 760 400 780 T 800 800 T 1200 780 T 1600 800 L 1600 900 L 0 900 Z"/>
+  </g>
+  <text x="800" y="500" text-anchor="middle" fill="#fffbeb" font-family="serif" font-size="80" font-weight="700">🌙</text>
+  <text x="800" y="580" text-anchor="middle" fill="#e0e7ff" font-family="serif" font-size="42" font-style="italic">NilaTales</text>
+</svg>

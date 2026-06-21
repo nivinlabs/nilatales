@@ -1,0 +1,39 @@
+---
+/**
+ * Universal story dispatcher at /stories/[slug].
+ *
+ * Stories are all served from one collection (stories), but a Thirukkural
+ * story at /stories/the-agam-couplet/ should ALSO resolve at its canonical
+ * /kural/1/1/ route. To keep the dispatcher simple:
+ *   - We don't generate per-kind dynamic routes — we use the universal
+ *     /stories/[slug] route for direct .md/.mdx lookups, AND
+ *   - The canonical routes (/kural/[adhigaaram]/[kural]/, /panchatantra/[tantra]/[slug]/)
+ *     live as additional getStaticPaths() entries below.
+ *
+ * The route is exposed both ways so that external links using either URL
+ * style work without redirect gymnastics.
+ */
+import StoryPost from '../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idWithoutExt } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories', ({ data }) => data.draft === false);
+
+  return stories.map((story) => ({
+    params: { slug: idWithoutExt(story) },
+    props: { story },
+  }));
+}
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story}>
+  <Content />
+</StoryPost>

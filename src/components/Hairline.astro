@@ -1,0 +1,25 @@
+---
+/**
+ * Hairline.astro — newspaper horizontal rule.
+ *
+ * Usage:
+ *   <Hairline />            — standard 1px hairline (--rule)
+ *   <Hairline strong />    — 2px bold rule (--rule-strong)
+ *   <Hairline color="paper-300" /> — custom color
+ */
+interface Props {
+  strong?: boolean;
+  color?: string;
+  class?: string;
+}
+const { strong = false, color, class: extra = '' } = Astro.props;
+const borderClass = strong ? 'border-t-2' : 'border-t';
+---
+<hr
+  class:list={[
+    'w-full my-0 border-0 h-px',
+    strong ? 'border-t-2 border-kohl-700' : 'border-t border-paper-300',
+    extra,
+  ]}
+  style={color ? `border-color: var(--color-${color})` : undefined}
+/>

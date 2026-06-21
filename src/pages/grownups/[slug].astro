@@ -1,0 +1,24 @@
+---
+import ResourcePost from '../../layouts/ResourcePost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const resources = await getCollection('resources', ({ data }) => data.draft === false);
+  return resources.map((r) => ({
+    params: { slug: idBasename(r) },
+    props: { entry: r },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'resources'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ResourcePost post={entry}>
+  <Content />
+</ResourcePost>
