@@ -1,19 +1,17 @@
 ---
 /**
- * Homepage — newspaper-for-kids redesign.
- * 9 sections per DESIGN.md §6:
+ * Homepage — claymorphism kids' story site (no newspaper chrome).
+ *
+ * Sections:
  *   1. Hero (2-col: story cover + deck + clay CTA)
  *   2. Six pillars (3×2 category tiles)
  *   3. Thirukkural of the Week (KuralBand)
  *   4. Featured stories (3-col card grid)
  *   5. Listen strip (4-col with clay play button)
- *   6. Comics strip (3-col clay-comic, scroll-snap)
- *   7. Recent stories (newspaper table)
- *   8. For grown-ups (slate box)
+ *   6. Comics strip (scroll-snap)
+ *   7. Recent stories (list)
+ *   8. For grown-ups (clay panel)
  *   9. About closing
- *
- * All sections gracefully degrade if collection is empty.
- * DESIGN.md §9.
  */
 import Layout from '../layouts/Layout.astro';
 import StoryCard from '../components/StoryCard.astro';
@@ -34,7 +32,7 @@ const heroStory = stories.find((s) => s.data.featured) ?? stories[0];
 const kurals = stories.filter((s) => s.data.kind === 'thirukkural');
 const kuralStory = kurals.find((s) => s.data.featured) ?? kurals[0];
 
-// Six pillars — static (derived from seed content counts, degrade gracefully)
+// Six pillars
 const pillars = [
   { emoji: '🌙', cat: 'leaf',   label: 'கதைகள்',  en: 'Stories',     href: '/stories/',    count: stories.filter(s => s.data.kind !== 'thirukkural' && s.data.kind !== 'panchatantra').length },
   { emoji: '📜', cat: 'amber',  label: 'குறள்',    en: 'Kural',       href: '/kural/',      count: kurals.length },
@@ -52,15 +50,13 @@ const featuredStories = stories
 // Listen: first 4 audio entries
 const listenItems = audio.slice(0, 4);
 
-// Recent stories: next 5 after featured (for newspaper table)
+// Recent stories: next 5 after featured
 const recentStories = stories
   .filter((s) => s.id !== heroStory?.id)
   .slice(3, 8);
 
-// Grown-ups: just a quiet notice — data driven if we add resources later
 const grownupsHref = '/grownups/';
 
-// Helpers
 function accentForKind(kind: string): string {
   const map: Record<string, string> = {
     moral: 'leaf', thirukkural: 'amber', panchatatantra: 'moss',
@@ -83,12 +79,10 @@ function readingTime(story: { data: { body?: string } }) {
 
   <!-- ══════════════════════════════════════════════
        §1 HERO — Tonight's Tale
-       2-col desktop: cover image + deck + CTA
-       Floating clay blobs behind hero for depth
   ══════════════════════════════════════════════ -->
   {heroStory && (
-    <section id="hero" class="py-10 md:py-16 relative overflow-hidden" aria-label="Tonight's Tale">
-      <!-- Floating clay blobs (decorative, performance-gated) -->
+    <section id="hero" class="py-8 md:py-14 relative overflow-hidden" aria-label="Tonight's Tale">
+      <!-- Floating clay blobs -->
       <div class="clay-blob clay-blob-lilac" style="width: 300px; height: 300px; top: -60px; right: -40px;" aria-hidden="true"></div>
       <div class="clay-blob clay-blob-peach clay-blob-2" style="width: 250px; height: 250px; bottom: -40px; left: -60px;" aria-hidden="true"></div>
       <div class="clay-blob clay-blob-mint clay-blob-3" style="width: 200px; height: 200px; top: 40%; left: 45%;" aria-hidden="true"></div>
@@ -96,7 +90,7 @@ function readingTime(story: { data: { body?: string } }) {
       <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center clay-enter">
 
-          <!-- Left: story cover — clay-raised card -->
+          <!-- Left: story cover -->
           <a
             href={storyRoute(heroStory)}
             class="clay-raised rounded-3xl overflow-hidden block aspect-[4/5] relative group"
@@ -117,32 +111,27 @@ function readingTime(story: { data: { body?: string } }) {
                     <span class="text-6xl">🌙</span>
                   </div>;
             })()}
-            <!-- Hover overlay -->
             <div class="absolute inset-0 bg-kohl-900/0 group-hover:bg-kohl-900/20 transition-colors duration-300" aria-hidden="true"></div>
           </a>
 
           <!-- Right: deck -->
-          <div class="flex flex-col gap-5">
-            <!-- Vol/Issue + date eyebrow -->
-            <div class="flex items-center gap-3">
-              <span class="eyebrow">VOL 1 · ISSUE 12</span>
-              <div class="h-px flex-1 bg-paper-300 max-w-[60px]"></div>
-              <span class="font-mono-editorial">21 ஜூன் 2026</span>
-            </div>
+          <div class="flex flex-col gap-4">
+            <span class="font-rounded font-bold text-sm text-twilight-500">
+              ✨ இன்றைய கதை · TONIGHT'S TALE
+            </span>
 
-            <!-- H1: Tamil title + English subtitle -->
-            <h1 class="font-display text-display font-black text-[2.25rem] md:text-5xl text-kohl-900 leading-none tracking-tight"
-                style="font-optical-sizing:auto">
+            <h1 class="font-rounded-ta text-4xl md:text-5xl font-bold text-kohl-900 leading-tight tracking-tight">
               {heroStory.data.title}
             </h1>
+
             {heroStory.data.subtitle && (
-              <p class="font-rounded italic text-display text-lg md:text-xl font-light text-kohl-500 leading-snug">
+              <p class="font-rounded-ta text-lg md:text-xl text-kohl-500 leading-snug">
                 {heroStory.data.subtitle}
               </p>
             )}
 
             <!-- Age + reading time -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
               <span class="chip">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                 {heroStory.data.ageRange ?? '3–8'} yr
@@ -151,36 +140,31 @@ function readingTime(story: { data: { body?: string } }) {
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 {readingTime(heroStory)}
               </span>
+              {heroStory.data.kind && (
+                <span class={`cat-pill cat-pill-${accentForKind(heroStory.data.kind)}`}>
+                  {heroStory.data.kind.toUpperCase()}
+                </span>
+              )}
             </div>
 
-            <!-- Kind badge -->
-            {heroStory.data.kind && (
-              <span class={`cat-pill cat-pill-${accentForKind(heroStory.data.kind)} w-fit`}>
-                {heroStory.data.kind.toUpperCase()}
-              </span>
-            )}
-
-            <!-- Summary (dek) -->
             {heroStory.data.summary && (
-              <p class="font-ui text-sm text-kohl-500 leading-relaxed line-clamp-3">
+              <p class="font-rounded text-base text-kohl-500 leading-relaxed line-clamp-3">
                 {heroStory.data.summary}
               </p>
             )}
 
-            <!-- Clay CTA pill -->
             <a
               href={storyRoute(heroStory)}
               class="btn-clay-primary self-start flex items-center gap-2 mt-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              இன்றைய கதையைப் படி · Read tonight
+              கதையைப் படி · Read tonight
             </a>
 
-            <!-- Secondary listen link -->
             {audio.find(a => a.data.title === heroStory.data.title) && (
               <a
                 href={`/listen/${idBasename(audio.find(a => a.data.title === heroStory.data.title)!)}/`}
-                class="flex items-center gap-2 font-ui text-sm font-semibold text-twilight-500 hover:text-twilight-700 transition-colors min-h-[44px]"
+                class="flex items-center gap-2 font-rounded text-sm font-semibold text-twilight-500 hover:text-twilight-700 transition-colors min-h-[44px]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
                 🎧 Listen instead
@@ -193,17 +177,13 @@ function readingTime(story: { data: { body?: string } }) {
     </section>
   )}
 
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
-
   <!-- ══════════════════════════════════════════════
-       §2 SIX PILLARS — category tiles
-       3-col desktop, 2-col tablet, 2-col mobile
+       §2 SIX PILLARS
   ══════════════════════════════════════════════ -->
   <section id="pillars" class="py-12 md:py-16" aria-label="Six Pillars">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
-      <SectionHeader eyebrow="EXPLORE · பிரிவுகள்" tamil="ஆறு தூண்கள்" />
+      <SectionHeader eyebrow="EXPLORE" tamil="பிரிவுகள்" />
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 clay-enter-stagger">
         {pillars.map(({ emoji, cat, label, en, href, count }) => (
@@ -212,7 +192,6 @@ function readingTime(story: { data: { body?: string } }) {
             class="clay-card flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
             aria-label={`${label} — ${en} (${count} items)`}
           >
-            <!-- Monogram emoji in colored pill -->
             <span
               class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl"
               style={`background: rgba(var(--color-${cat}), 0.12)`}
@@ -220,13 +199,11 @@ function readingTime(story: { data: { body?: string } }) {
             >
               {emoji}
             </span>
-            <!-- Title stack -->
             <div>
-              <p class="font-serif-ta text-base font-semibold text-kohl-700 leading-none">{label}</p>
-              <p class="font-ui text-xs font-medium text-paper-400 mt-0.5">{en}</p>
+              <p class="font-rounded-ta text-base font-semibold text-kohl-700 leading-none">{label}</p>
+              <p class="font-rounded text-xs font-medium text-paper-400 mt-0.5">{en}</p>
             </div>
-            <!-- Count -->
-            <p class="font-mono text-[0.6875rem] text-paper-400 mt-auto">
+            <p class="font-rounded text-xs text-paper-400 mt-auto">
               {count > 0 ? `${count} ${count === 1 ? 'item' : 'items'}` : 'Coming soon'}
             </p>
           </a>
@@ -235,9 +212,6 @@ function readingTime(story: { data: { body?: string } }) {
 
     </div>
   </section>
-
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
 
   <!-- ══════════════════════════════════════════════
        §3 THIRUKKURAL OF THE WEEK
@@ -253,14 +227,14 @@ function readingTime(story: { data: { body?: string } }) {
   )}
 
   <!-- ══════════════════════════════════════════════
-       §4 FEATURED STORIES — 3-col card grid
+       §4 FEATURED STORIES
   ══════════════════════════════════════════════ -->
   {featuredStories.length > 0 && (
     <section id="featured" class="py-12 md:py-16" aria-label="Featured Stories">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
         <SectionHeader
-          eyebrow="FEATURED · சிறந்த"
+          eyebrow="FEATURED"
           tamil="சிறந்த கதைகள்"
           href="/stories/"
         />
@@ -276,7 +250,6 @@ function readingTime(story: { data: { body?: string } }) {
                 class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-1 transition-all duration-200 clay-card"
                 aria-label={story.data.title}
               >
-                <!-- Image — clay-card shadow, 4:3 -->
                 <div class="aspect-[4/3] overflow-hidden bg-paper-200">
                   {cover.src
                     ? <img
@@ -290,16 +263,14 @@ function readingTime(story: { data: { body?: string } }) {
                     : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-4xl" aria-hidden="true">📖</div>
                   }
                 </div>
-                <!-- Body -->
                 <div class="flex flex-col gap-2 p-5">
                   <span class={`cat-pill cat-pill-${accent} w-fit`}>{story.data.kind?.toUpperCase()}</span>
-                  <h3 class="font-rounded font-bold text-[1.05rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                  <h3 class="font-rounded-ta font-bold text-lg text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                     {story.data.title}
                   </h3>
                   {story.data.summary && (
-                    <p class="font-ui text-[0.8125rem] text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
+                    <p class="font-rounded text-sm text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
                   )}
-                  <!-- Footer chips -->
                   <div class="flex items-center gap-2 mt-2">
                     <span class="chip">{story.data.ageRange ?? '3–8'} yr</span>
                     <span class="chip">{readingTime(story)}</span>
@@ -314,18 +285,15 @@ function readingTime(story: { data: { body?: string } }) {
     </section>
   )}
 
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
-
   <!-- ══════════════════════════════════════════════
-       §5 LISTEN STRIP — audio cards with clay play button
+       §5 LISTEN STRIP
   ══════════════════════════════════════════════ -->
   {listenItems.length > 0 && (
     <section id="listen" class="py-12 md:py-16" aria-label="Listen">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
         <SectionHeader
-          eyebrow="LISTEN · கேட்க"
+          eyebrow="LISTEN"
           tamil="கதைகளைக் கேட்க"
           href="/listen/"
         />
@@ -340,12 +308,10 @@ function readingTime(story: { data: { body?: string } }) {
                 class="clay-card flex flex-col gap-4 p-5 rounded-2xl bg-paper-50 border border-paper-300 hover:bg-paper-100 transition-colors duration-150 group"
                 aria-label={`Listen to ${a.data.title}`}
               >
-                <!-- Play button row -->
                 <div class="flex items-center justify-between">
                   <span class={`cat-pill cat-pill-${accent} w-fit`}>
                     {a.data.type === 'lullaby' ? '🎵 LULLABY' : '🎧 NARRATION'}
                   </span>
-                  <!-- Clay play button — inline SVG play icon -->
                   <button
                     type="button"
                     class="btn-play btn-play-56 clay-raised flex items-center justify-center rounded-full"
@@ -357,13 +323,11 @@ function readingTime(story: { data: { body?: string } }) {
                     </svg>
                   </button>
                 </div>
-                <!-- Title -->
-                <h3 class="font-rounded font-bold text-[1rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                <h3 class="font-rounded-ta font-bold text-base text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                   {a.data.title}
                 </h3>
-                <!-- Duration + age -->
                 <div class="flex items-center gap-2 mt-auto">
-                  <span class="font-mono text-[0.6875rem] text-paper-400">{a.data.duration ?? '—'}</span>
+                  <span class="font-rounded text-xs text-paper-400">{a.data.duration ?? '—'}</span>
                   {a.data.audioAgeRange && (
                     <span class="chip">{a.data.audioAgeRange}+ yr</span>
                   )}
@@ -377,19 +341,16 @@ function readingTime(story: { data: { body?: string } }) {
     </section>
   )}
 
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
-
   <!-- ══════════════════════════════════════════════
-       §6 COMICS STRIP — clay-comic, scroll-snap
+       §6 COMICS STRIP
   ══════════════════════════════════════════════ -->
   {comics.length > 0 && (
     <section id="comics" class="py-12 md:py-16" aria-label="Comics">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
         <SectionHeader
-          eyebrow="COMICS · நகைச்சுவை"
-          tamil="வசதியாகப் படியுங்கள்"
+          eyebrow="COMICS"
+          tamil="நகைச்சுவை"
           href="/comics/"
         />
 
@@ -407,7 +368,6 @@ function readingTime(story: { data: { body?: string } }) {
                 ]}
                 aria-label={comic.data.title}
               >
-                <!-- Cover image -->
                 <div class="aspect-[4/5] overflow-hidden bg-paper-200 p-3 pb-0">
                   {cover.src
                     ? <img
@@ -421,16 +381,15 @@ function readingTime(story: { data: { body?: string } }) {
                     : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-5xl rounded-xl" aria-hidden="true">🎨</div>
                   }
                 </div>
-                <!-- Card body -->
                 <div class="p-4 pt-2 flex flex-col gap-1">
-                  <p class="font-mono text-[0.6rem] text-paper-400 uppercase tracking-widest">
-                    STRIP {String(i + 1).padStart(2, '0')}
+                  <p class="font-rounded text-xs text-paper-400 uppercase tracking-wide">
+                    Strip {String(i + 1).padStart(2, '0')}
                   </p>
-                  <h3 class="font-rounded font-bold text-[0.95rem] text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                  <h3 class="font-rounded-ta font-bold text-base text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
                     {comic.data.title}
                   </h3>
                   {comic.data.summary && (
-                    <p class="font-ui text-[0.75rem] text-kohl-500 line-clamp-2">{comic.data.summary}</p>
+                    <p class="font-rounded text-sm text-kohl-500 line-clamp-2">{comic.data.summary}</p>
                   )}
                 </div>
               </a>
@@ -442,19 +401,15 @@ function readingTime(story: { data: { body?: string } }) {
     </section>
   )}
 
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
-
   <!-- ══════════════════════════════════════════════
-       §7 RECENT STORIES — newspaper table
-       3px category-color left bar + hairline rows
+       §7 RECENT STORIES
   ══════════════════════════════════════════════ -->
   {recentStories.length > 0 && (
     <section id="recent" class="py-12 md:py-16" aria-label="Recent Stories">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
         <SectionHeader
-          eyebrow="RECENT · சமீபத்திய"
+          eyebrow="RECENT"
           tamil="சமீபத்திய கதைகள்"
           href="/stories/"
         />
@@ -469,25 +424,22 @@ function readingTime(story: { data: { body?: string } }) {
                   href={href}
                   class="flex items-start gap-4 py-4 hover:bg-paper-100 -mx-4 px-4 transition-colors duration-150 group"
                 >
-                  <!-- 3px accent bar -->
                   <div
                     class="flex-shrink-0 w-0.5 self-stretch rounded-full mt-1"
                     style={`background-color: var(--color-${accent})`}
                     aria-hidden="true"
                   ></div>
-                  <!-- Title + summary -->
                   <div class="flex-1 min-w-0">
-                    <h3 class="font-rounded font-bold text-[1.0625rem] text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
+                    <h3 class="font-rounded-ta font-bold text-base text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
                       {story.data.title}
                     </h3>
                     {story.data.summary && (
-                      <p class="font-ui text-[0.8125rem] text-kohl-500 line-clamp-1">{story.data.summary}</p>
+                      <p class="font-rounded text-sm text-kohl-500 line-clamp-1">{story.data.summary}</p>
                     )}
                   </div>
-                  <!-- Date -->
                   <time
                     datetime={story.data.pubDate.toISOString()}
-                    class="font-mono text-[0.6875rem] text-paper-400 flex-shrink-0 mt-1 whitespace-nowrap"
+                    class="font-rounded text-xs text-paper-400 flex-shrink-0 mt-1 whitespace-nowrap"
                   >
                     {story.data.pubDate.toLocaleDateString('ta-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </time>
@@ -501,26 +453,25 @@ function readingTime(story: { data: { body?: string } }) {
     </section>
   )}
 
-  <!-- Hairline divider -->
-  <div class="max-w-5xl mx-auto px-4 sm:px-6"><div class="border-t border-paper-300"></div></div>
-
   <!-- ══════════════════════════════════════════════
-       §8 FOR GROWN-UPS — slate box
+       §8 FOR GROWN-UPS
   ══════════════════════════════════════════════ -->
   <section id="grownups" class="py-12 md:py-16" aria-label="For Grown-ups">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
       <div class="max-w-prose mx-auto text-center flex flex-col gap-4 items-center">
 
-        <p class="eyebrow">ஆசிரியர்களுக்கும் பெற்றோர்களுக்கும் · FOR GROWN-UPS</p>
+        <span class="font-rounded font-bold text-sm text-twilight-500">
+          ஆசிரியர்களுக்கும் பெற்றோர்களுக்கும் · FOR GROWN-UPS
+        </span>
 
         <div class="clay-card p-6 rounded-2xl bg-paper-200 border border-paper-300 flex flex-col gap-3 text-left w-full">
-          <p class="font-ui text-[1.0625rem] text-slate-700 leading-relaxed">
+          <p class="font-rounded text-base text-slate-700 leading-relaxed">
             Lesson plans, vocabulary guides, and parent notes — everything you need
             to continue the story at home or in class.
           </p>
           <a
             href={grownupsHref}
-            class="inline-flex items-center gap-2 font-ui font-semibold text-[0.875rem] text-slate-700 hover:text-slate-900 transition-colors self-start min-h-[44px]"
+            class="inline-flex items-center gap-2 font-rounded font-semibold text-sm text-slate-700 hover:text-slate-900 transition-colors self-start min-h-[44px]"
           >
             Browse the teacher's shelf
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
@@ -537,13 +488,11 @@ function readingTime(story: { data: { body?: string } }) {
   <section id="about" class="py-12 md:py-16 bg-paper-200" aria-label="About NilaTales">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center flex flex-col gap-4 items-center">
 
-      <div class="border-t-2 border-kohl-300 w-24 mx-auto"></div>
-
-      <p class="font-display italic text-display text-xl md:text-2xl text-kohl-700" style="font-optical-sizing:auto">
+      <p class="font-rounded-ta text-xl md:text-2xl text-kohl-700 leading-snug max-w-prose">
         "Every child deserves stories in their mother tongue."
       </p>
 
-      <p class="font-ui text-sm text-kohl-500 leading-relaxed max-w-prose">
+      <p class="font-rounded text-sm text-kohl-500 leading-relaxed max-w-prose">
         NilaTales publishes original illustrated Tamil stories for children aged 3–12.
         We believe bedtime stories are where language lives — where a child learns not just
         words, but wonder.

@@ -1,38 +1,62 @@
 ---
 /**
- * Colophon.astro — newspaper footer colophon.
+ * Colophon.astro — clean footer (no newspaper colophon).
  *
- * DESIGN.md §6 Footer colophon + §16.
+ * Brand mark, quick links, social, copyright.
  */
 ---
 <footer class="bg-paper-100 border-t border-paper-300 py-12 mt-16" aria-label="Site footer">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
 
-    <!-- Tagline -->
-    <p class="font-display italic text-display text-xl text-kohl-700 mb-6" style="font-optical-sizing:auto">
-      நிலா கதைகள் — Stories for sleepy Tamil kids.
-    </p>
+    <!-- Top: brand + description -->
+    <div class="flex flex-col md:flex-row gap-8 mb-10">
 
-    <!-- Small print -->
-    <div class="font-ui text-[0.75rem] text-kohl-500 space-y-1 mb-8">
-      <p>Printed in Tamil Nadu · Founded ஜனவரி 2026</p>
-      <p>© 2026 NilaTales · Made with Astro &amp; Tailwind CSS</p>
-      <p>Tamil + English · <a href="/about/" class="text-twilight-500 hover:underline">About</a> · <a href="/rss.xml" class="text-twilight-500 hover:underline">RSS</a></p>
+      <!-- Brand -->
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="text-twilight-500" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <span class="font-rounded-ta text-lg font-bold text-kohl-700">நிலா கதைகள்</span>
+        </div>
+        <p class="font-rounded text-sm text-kohl-500 max-w-xs leading-relaxed">
+          Illustrated Tamil bedtime stories for children. Moral tales, Thirukkural, Panchatantra, comics, lullabies, and activities.
+        </p>
+      </div>
+
+      <!-- Links -->
+      <div class="flex gap-12">
+        <div class="flex flex-col gap-2">
+          <p class="font-rounded font-semibold text-sm text-kohl-700 mb-1">Explore</p>
+          <a href="/stories/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Stories</a>
+          <a href="/kural/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Kural</a>
+          <a href="/panchatantra/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Panchatantra</a>
+          <a href="/comics/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Comics</a>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="font-rounded font-semibold text-sm text-kohl-700 mb-1">More</p>
+          <a href="/listen/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Listen</a>
+          <a href="/activities/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Activities</a>
+          <a href="/grownups/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">Teachers</a>
+          <a href="/about/" class="font-rounded text-sm text-kohl-500 hover:text-twilight-500 transition-colors">About</a>
+        </div>
+      </div>
     </div>
 
-    <!-- Hairline -->
-    <div class="border-t border-paper-300 mx-auto mb-6" style="max-width:200px"></div>
-
-    <!-- Bottom nav -->
-    <nav class="flex items-center justify-center gap-6 font-ui text-[0.75rem] font-medium text-kohl-500" aria-label="Footer navigation">
-      <a href="/about/" class="hover:text-twilight-500 transition-colors">About</a>
-      <a href="/grownups/" class="hover:text-twilight-500 transition-colors">Teachers</a>
-      <a href="/privacy/" class="hover:text-twilight-500 transition-colors">Privacy</a>
-      <a href="/rss.xml" class="hover:text-twilight-500 transition-colors flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
-        RSS
-      </a>
-    </nav>
+    <!-- Bottom: copyright -->
+    <div class="border-t border-paper-300 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="font-rounded text-xs text-kohl-300">
+        © 2026 NilaTales · Made with Astro & Tailwind CSS
+      </p>
+      <nav class="flex items-center gap-4" aria-label="Footer utility">
+        <a href="/about/" class="font-rounded text-xs text-kohl-300 hover:text-twilight-500 transition-colors">About</a>
+        <a href="/privacy/" class="font-rounded text-xs text-kohl-300 hover:text-twilight-500 transition-colors">Privacy</a>
+        <a href="/rss.xml" class="font-rounded text-xs text-kohl-300 hover:text-twilight-500 transition-colors flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+          RSS
+        </a>
+      </nav>
+    </div>
 
   </div>
 </footer>

@@ -1,43 +1,37 @@
 ---
 /**
- * Masthead.astro — newspaper nameplate + Tamil date + Vol/Issue + hairline.
+ * Masthead.astro — clean brand header (no newspaper chrome).
  *
- * DESIGN.md §6 Masthead.
- * Shown at the very top of every page, above the nav.
+ * Logo mark + site name + tagline. Soft, rounded, claymorphism.
  */
 ---
-<header class="w-full bg-paper-50 pt-6 pb-0">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+<header class="w-full bg-paper-50 pt-8 pb-4">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
 
-    <!-- Top row: Vol/Issue · date · ISSN -->
-    <div class="flex items-center justify-between mb-3">
-      <span class="font-mono-editorial">VOL 1 · ISSUE 12</span>
-      <span class="font-mono-editorial">21 ஜூன் 2026</span>
-      <span class="font-mono-editorial">ISSN 2026–1247</span>
+    <!-- Logo + name -->
+    <a href="/" class="flex items-center gap-3 group" aria-label="NilaTales — Home">
+      <!-- Moon logo mark (SVG) -->
+      <span class="clay-raised flex items-center justify-center w-12 h-12 rounded-2xl bg-twilight-50 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="text-twilight-500" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </span>
+      <div class="flex flex-col">
+        <span class="font-rounded-ta text-2xl font-bold text-kohl-900 leading-none tracking-tight">
+          நிலா கதைகள்
+        </span>
+        <span class="font-rounded text-sm text-kohl-500 leading-none mt-1">
+          NilaTales
+        </span>
+      </div>
+    </a>
+
+    <!-- Right: date + bedtime toggle -->
+    <div class="flex items-center gap-3">
+      <span class="font-rounded text-sm text-kohl-300 hidden sm:block">
+        {new Date().toLocaleDateString('ta-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+      </span>
     </div>
-
-    <!-- Hairline rule -->
-    <div class="border-t border-kohl-700 border-t-2 mb-3"></div>
-
-    <!-- Nameplate -->
-    <div class="text-center mb-1">
-      <h1 class="font-display text-display text-[2.5rem] sm:text-5xl font-black tracking-tight text-kohl-900 leading-none"
-          style="font-optical-sizing:auto">
-        நிலா கதைகள்
-      </h1>
-      <p class="font-display text-display italic text-lg sm:text-xl font-light text-kohl-500 tracking-wide"
-         style="font-optical-sizing:auto">
-        NilaTales — bedtime stories in Tamil
-      </p>
-    </div>
-
-    <!-- Second hairline -->
-    <div class="border-t border-paper-300 mt-3"></div>
-
-    <!-- Tagline / deck (below nameplate) -->
-    <p class="text-center font-mono-editorial text-[11px] tracking-widest uppercase text-kohl-300 mt-2 mb-0">
-      Illustrated Tamil stories for children · Tamil children's publishing
-    </p>
 
   </div>
 </header>

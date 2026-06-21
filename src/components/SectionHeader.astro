@@ -1,17 +1,11 @@
 ---
 /**
- * SectionHeader.astro — newspaper section heading.
+ * SectionHeader.astro — clean section heading.
  *
  * Usage:
  *   <SectionHeader eyebrow="KURAL OF THE WEEK" tamil="இன்றைய குறள்">
  *     Thirukkural of the Week
  *   </SectionHeader>
- *
- *   <SectionHeader eyebrow="FEATURED" tamil="சிறந்த கதைகள்" href="/stories/">
- *     Featured Stories
- *   </SectionHeader>
- *
- * DESIGN.md §8.
  */
 interface Props {
   eyebrow: string;
@@ -20,17 +14,16 @@ interface Props {
   class?: string;
 }
 const { eyebrow, tamil, href, class: extra = '' } = Astro.props;
-const Tag = href ? 'div' : 'div';
 ---
 <div class:list={['flex items-end justify-between mb-6 gap-4', extra]}>
-  <div class="flex flex-col gap-0.5">
-    <span class="eyebrow">{eyebrow}</span>
-    {tamil && <span class="font-serif-ta text-sm text-paper-400">{tamil}</span>}
+  <div class="flex flex-col gap-1">
+    <span class="font-rounded font-bold text-sm text-twilight-500 tracking-wide">{eyebrow}</span>
+    {tamil && <span class="font-rounded-ta text-lg text-kohl-700">{tamil}</span>}
   </div>
   {href ? (
     <a
       href={href}
-      class="flex items-center gap-1 text-[0.75rem] font-ui font-semibold text-twilight-500 hover:text-twilight-700 whitespace-nowrap min-h-[44px] justify-center transition-colors duration-150"
+      class="flex items-center gap-1 text-sm font-rounded font-semibold text-twilight-500 hover:text-twilight-700 whitespace-nowrap min-h-[44px] justify-center transition-colors duration-150"
     >
       See all
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
