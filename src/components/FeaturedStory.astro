@@ -1,0 +1,119 @@
+---
+/**
+ * FeaturedStory — "Story of the Day" section on the homepage.
+ * Dynamically picks a story based on the current date so it changes daily.
+ * Uses a deterministic hash of the date to pick from all published stories.
+ */
+import Layout from '../layouts/Layout.astro';
+import { publishedStories, storyRoute, resolveCover, idBasename } from '../utils/content';
+
+const stories = await publishedStories();
+if (stories.length === 0) return;
+
+// Deterministic daily selection: use day-of-year modulo story count
+const now = new Date();
+const startOfYear = new Date(now.getFullYear(), 0, 0);
+const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+const featuredIndex = dayOfYear % stories.length;
+const featured = stories[featuredIndex];
+
+const cover = resolveCover(featured.data.cover, { width: 600 });
+
+function accentForKind(kind: string): string {
+  const map: Record<string, string> = {
+    moral: 'leaf', thirukkural: 'amber', panchatatantra: 'moss',
+    comic: 'rose', lullaby: 'violet', narration: 'violet',
+    activity: 'sky', 'teacher-guide': 'slate',
+  };
+  return map[kind] ?? 'leaf';
+}
+
+const accent = accentForKind(featured.data.kind ?? '');
+const href = storyRoute(featured);
+const readingTimeStr = featured.data.readingTimeMin ? `${featured.data.readingTimeMin} min read` : '5 min read';
+---
+
+<section id="story-of-the-day" class="py-12 md:py-16 bg-paper-100" aria-label="Story of the Day">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <div class="text-center mb-8">
+      <span class="font-rounded font-bold text-sm text-amber-500 tracking-wide">
+        ✨ இன்றைய சிறப்புக் கதை · STORY OF THE DAY
+      </span>
+      <p class="font-rounded text-xs text-paper-400 mt-1">
+        Changes daily · {now.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })}
+      </p>
+    </div>
+
+    <div class="clay-card rounded-3xl bg-paper-50 border border-paper-200 overflow-hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+
+        <!-- Cover image -->
+        <div class="aspect-[4/3] md:aspect-auto overflow-hidden relative">
+          {cover?.src
+            ? <img
+                src={cover.src}
+                alt={featured.data.title}
+                width={cover.width ?? 600}
+                height={Math.round((cover.width ?? 600) * 3 / 4)}
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+            : <div class="w-full h-full bg-twilight-50 flex items-center justify-center min-h-[240px]">
+                <span class="text-6xl">🌙</span>
+              </div>
+          }
+          <div class="absolute inset-0 bg-gradient-to-t from-kohl-900/30 to-transparent md:bg-gradient-to-r md:from-transparent md:to-kohl-900/10" aria-hidden="true"></div>
+        </div>
+
+        <!-- Story info -->
+        <div class="flex flex-col gap-4 p-6 md:p-8 justify-center">
+          <span class={`cat-pill cat-pill-${accent} w-fit`}>
+            {featured.data.kind?.toUpperCase()}
+          </span>
+
+          <h2 class="font-rounded-ta text-2xl md:text-3xl font-bold text-kohl-900 leading-tight">
+            {featured.data.title}
+          </h2>
+
+          {featured.data.subtitle && (
+            <p class="font-rounded-ta text-base text-kohl-500 leading-snug">
+              {featured.data.subtitle}
+            </p>
+          )}
+
+          <div class="flex items-center gap-2 flex-wrap">
+            {featured.data.ageRange && (
+              <span class="chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                {featured.data.ageRange.min}–{featured.data.ageRange.max} yr
+              </span>
+            )}
+            <span class="chip">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              {readingTimeStr}
+            </span>
+            {featured.data.difficulty && (
+              <span class="chip">{featured.data.difficulty}</span>
+            )}
+          </div>
+
+          {featured.data.summary && (
+            <p class="font-rounded text-sm text-kohl-500 line-clamp-3 leading-relaxed">
+              {featured.data.summary}
+            </p>
+          )}
+
+          <a
+            href={href}
+            class="btn-clay-primary self-start flex items-center gap-2 mt-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            கதையைப் படி · Read today
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

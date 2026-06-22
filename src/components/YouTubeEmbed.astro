@@ -1,0 +1,104 @@
+---
+/**
+ * YouTubeEmbed.astro — Lazy-loaded YouTube embed for NitviTalks channel.
+ *
+ * Uses the lite-youtube-embed pattern: shows a thumbnail with a play button
+ * that loads the iframe only on click. No external JS until user interacts.
+ *
+ * Channel: https://www.youtube.com/@NitviTalks
+ * Design: paper-100 card with clay-raised play button, matching Listen strip.
+ */
+interface Props {
+  /** YouTube video ID */
+  videoId?: string;
+  /** Video title (for a11y) */
+  title?: string;
+}
+
+const {
+  videoId = 'dQw4w9WgXcQ', // placeholder — replace with latest NitviTalks video
+  title = 'NitviTalks — Tamil stories and more',
+} = Astro.props;
+
+const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+---
+
+<section class="py-12 md:py-16" aria-label="YouTube — NitviTalks">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <div class="flex items-center gap-2 mb-6">
+      <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="var(--color-rose)" aria-hidden="true">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="font-rounded-ta text-lg font-bold text-kohl-700">நிற்வி Talks</h2>
+        <p class="font-rounded text-xs text-kohl-500">Watch on YouTube</p>
+      </div>
+    </div>
+
+    <!-- Lite YouTube embed — loads iframe on click only -->
+    <div class="max-w-2xl">
+      <div
+        class="relative rounded-2xl overflow-hidden bg-paper-200 border border-paper-300 group cursor-pointer"
+        style="padding-top: 56.25%;"
+        data-yt-video-id={videoId}
+        role="button"
+        tabindex="0"
+        aria-label={`Play video: ${title}`}
+        id="yt-embed"
+      >
+        <!-- Thumbnail -->
+        <img
+          src={thumbnailUrl}
+          alt={title}
+          loading="lazy"
+          class="absolute inset-0 w-full h-full object-cover"
+        />
+        <!-- Play overlay -->
+        <div class="absolute inset-0 bg-kohl-900/30 flex items-center justify-center group-hover:bg-kohl-900/40 transition-colors">
+          <div class="btn-play btn-play-80 clay-raised flex items-center justify-center rounded-full bg-white/95">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="var(--color-twilight-500)" aria-hidden="true">
+              <path d="M5 3l14 9-14 9V3z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="https://www.youtube.com/@NitviTalks"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 font-rounded font-semibold text-sm text-twilight-500 hover:text-twilight-700 transition-colors mt-3 min-h-[44px]"
+      >
+        Subscribe on YouTube
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  // Lazy YouTube embed: replace thumbnail with iframe on click
+  document.querySelectorAll('[data-yt-video-id]').forEach((el) => {
+    const handler = () => {
+      const videoId = el.getAttribute('data-yt-video-id');
+      if (!videoId) return;
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      iframe.title = el.getAttribute('aria-label') || 'YouTube video';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:1rem;';
+      el.innerHTML = '';
+      el.appendChild(iframe);
+      el.style.cursor = 'default';
+      el.removeAttribute('role');
+      el.removeAttribute('tabindex');
+    };
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
+  });
+</script>

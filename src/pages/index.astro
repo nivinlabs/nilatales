@@ -19,6 +19,14 @@ import SectionHeader from '../components/SectionHeader.astro';
 import KuralBand from '../components/KuralBand.astro';
 import CategoryPill from '../components/CategoryPill.astro';
 import PlayButton from '../components/PlayButton.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import SocialProof from '../components/SocialProof.astro';
+import FeaturedStory from '../components/FeaturedStory.astro';
+import YouTubeEmbed from '../components/YouTubeEmbed.astro';
+import InstagramFeed from '../components/InstagramFeed.astro';
+import PremiumStories from '../components/PremiumStories.astro';
+import SupportSection from '../components/SupportSection.astro';
+import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
 import { publishedStories, publishedComics, publishedAudio, storyRoute, resolveCover, idBasename } from '../utils/content';
 
 const stories  = await publishedStories();
@@ -454,7 +462,42 @@ function readingTime(story: { data: { body?: string } }) {
   )}
 
   <!-- ══════════════════════════════════════════════
-       §8 FOR GROWN-UPS
+       §8 STORY OF THE DAY
+  ══════════════════════════════════════════════ -->
+  <FeaturedStory />
+
+  <!-- ══════════════════════════════════════════════
+       §9 SOCIAL PROOF (NitviTalks)
+  ══════════════════════════════════════════════ -->
+  <SocialProof />
+
+  <!-- ══════════════════════════════════════════════
+       §10 NEWSLETTER SIGNUP
+  ══════════════════════════════════════════════ -->
+  <NewsletterSignup />
+
+  <!-- ══════════════════════════════════════════════
+       §10b YOUTUBE EMBED (NitviTalks)
+  ══════════════════════════════════════════════ -->
+  <YouTubeEmbed />
+
+  <!-- ══════════════════════════════════════════════
+       §10c INSTAGRAM FEED
+  ══════════════════════════════════════════════ -->
+  <InstagramFeed />
+
+  <!-- ══════════════════════════════════════════════
+       §10d AD SENSE (placeholder — horizontal)
+  ══════════════════════════════════════════════ -->
+  <AdSensePlaceholder format="horizontal" slotId="nilatales-home-leaderboard" />
+
+  <!-- ══════════════════════════════════════════════
+       §10e PREMIUM STORIES (coming soon)
+  ══════════════════════════════════════════════ -->
+  <PremiumStories />
+
+  <!-- ══════════════════════════════════════════════
+       §11 FOR GROWN-UPS
   ══════════════════════════════════════════════ -->
   <section id="grownups" class="py-12 md:py-16" aria-label="For Grown-ups">
     <div class="max-w-5xl mx-auto px-4 sm:px-6">
@@ -483,7 +526,7 @@ function readingTime(story: { data: { body?: string } }) {
   </section>
 
   <!-- ══════════════════════════════════════════════
-       §9 ABOUT CLOSING
+       §12 ABOUT CLOSING
   ══════════════════════════════════════════════ -->
   <section id="about" class="py-12 md:py-16 bg-paper-200" aria-label="About NilaTales">
     <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center flex flex-col gap-4 items-center">
@@ -507,5 +550,10 @@ function readingTime(story: { data: { body?: string } }) {
 
     </div>
   </section>
+
+  <!-- ══════════════════════════════════════════════
+       §13 SUPPORT NILATALES
+  ══════════════════════════════════════════════ -->
+  <SupportSection />
 
 </Layout>

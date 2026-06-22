@@ -11,6 +11,12 @@
  */
 import Layout from './Layout.astro';
 import PostHeader from '../components/PostHeader.astro';
+import ShareButtons from '../components/ShareButtons.astro';
+import RelatedStories from '../components/RelatedStories.astro';
+import PrintStoryButton from '../components/PrintStoryButton.astro';
+import AmazonAffiliate from '../components/AmazonAffiliate.astro';
+import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import { resolveCover, idBasename } from '../utils/content';
 import { getEntry, type CollectionEntry } from 'astro:content';
 
@@ -69,6 +75,25 @@ const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : nul
           cover={coverMeta ?? undefined}
           coverAlt={data.coverAlt}
         />
+
+        <!-- Mobile reading-meta bar (visible only on small screens) -->
+        <div class="flex flex-wrap gap-2 mb-6 lg:hidden max-w-prose">
+          {data.ageRange && (
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-twilight-50 border border-twilight-200 text-twilight-700 font-rounded text-sm font-semibold">
+              🎂 {data.ageRange.min}–{data.ageRange.max} yr
+            </span>
+          )}
+          {data.readingTimeMin && (
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-200 border border-paper-300 text-kohl-700 font-rounded text-sm font-medium">
+              ⏱ {data.readingTimeMin} min
+            </span>
+          )}
+          {data.difficulty && (
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-200 border border-paper-300 text-kohl-500 font-rounded text-sm font-medium capitalize">
+              📖 {data.difficulty}
+            </span>
+          )}
+        </div>
 
         <!-- Thirukkural: couplet block -->
         {data.kind === 'thirukkural' && data.source?.kind === 'thirukkural' && (
@@ -155,6 +180,23 @@ const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : nul
           )}
         </article>
 
+        <!-- Share buttons -->
+        <ShareButtons
+          title={data.title}
+          url={Astro.url.href}
+          description={data.summary}
+        />
+
+        <!-- Ad placeholder (mid-story) -->
+        <AdSensePlaceholder format="horizontal" slotId={`nilatales-story-${data.kind}-mid`} />
+
+        <!-- Related stories -->
+        <RelatedStories
+          currentStory={post}
+          relatedIds={(data.related ?? []).map((r: any) => r.slug ?? r.id ?? r)}
+          max={3}
+        />
+
         <!-- Continue with… cross-links -->
         {(audioEntry || activityEntry || teacherEntry) && (
           <footer class="mt-16 pt-8 border-t border-paper-300">
@@ -220,6 +262,16 @@ const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : nul
             </ul>
           </footer>
         )}
+
+        <!-- Amazon affiliate book recommendations -->
+        <AmazonAffiliate />
+
+        <!-- Newsletter signup -->
+        <NewsletterSignup
+          headingTa="கதைகளை மிஸ் செய்யாதீர்கள்"
+          headingEn="Never miss a story"
+          subtitle="Get new Tamil bedtime stories delivered to your inbox every week."
+        />
       </div>
 
       <!-- ── Sticky right rail (desktop only) ─── -->
@@ -276,6 +328,9 @@ const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : nul
               Print activity
             </a>
           )}
+
+          <!-- Print this story button -->
+          <PrintStoryButton storyTitle={data.title} />
 
         </div>
       </aside>

@@ -1,0 +1,62 @@
+---
+/**
+ * PremiumStories.astro — Placeholder section for future subscription model.
+ *
+ * Shows a teaser for upcoming premium content with a "Coming soon" CTA.
+ * Ready to be swapped for a real paywall/subscription section later.
+ * Design: twilight gradient card, clay-raised, premium feel.
+ */
+---
+
+<section class="py-12 md:py-16" aria-label="Premium stories">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="rounded-2xl overflow-hidden relative" style="background: linear-gradient(135deg, var(--color-twilight-50) 0%, var(--color-paper-100) 100%);">
+
+      <!-- Decorative shimmer -->
+      <div class="absolute top-0 right-0 w-48 h-48 opacity-10" aria-hidden="true" style="background: radial-gradient(circle, var(--color-twilight-500) 0%, transparent 70%);"></div>
+
+      <div class="relative z-10 p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
+
+        <!-- Left: icon + lock -->
+        <div class="flex-shrink-0 text-center">
+          <div class="clay-raised inline-flex items-center justify-center w-16 h-16 rounded-2xl" style="background: var(--gradient-clay-cta);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Right: content -->
+        <div class="flex-1 text-center md:text-left">
+          <span class="eyebrow text-twilight-500">COMING SOON · விரைவில்</span>
+          <h2 class="font-rounded-ta text-xl md:text-2xl font-bold text-kohl-700 mt-2 mb-2">
+            Premium Stories for Kids
+          </h2>
+          <p class="font-rounded-ta text-base text-kohl-500 leading-relaxed mb-1">
+            சிறப்புக் கதைகள், ஒலி வடிவில், விளக்கப்படங்களுடன்.
+          </p>
+          <p class="font-rounded text-sm text-kohl-500 leading-relaxed">
+            Exclusive illustrated stories, read-along audio, and printable worksheets — a curated
+            library for families who want more Tamil content for their children.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-3 mt-5 justify-center md:justify-start">
+            <button
+              type="button"
+              disabled
+              class="btn-clay-primary opacity-80 cursor-not-allowed"
+              aria-label="Notify me when premium launches"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notify me at launch
+            </button>
+            <span class="font-rounded text-xs text-paper-400 self-center">
+              Free stories will always remain free ★
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

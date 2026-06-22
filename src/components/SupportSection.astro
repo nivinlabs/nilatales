@@ -1,0 +1,72 @@
+---
+/**
+ * SupportSection.astro — "Support NilaTales" CTA for BuyMeACoffee / Patreon.
+ *
+ * Placed on homepage (before footer) and story pages (below affiliate section).
+ * Design: warm clay card with heart icon, twilight accent.
+ */
+interface Props {
+  /** BuyMeACoffee username (slug) */
+  buymeacoffee?: string;
+  /** Patreon creator slug */
+  patreon?: string;
+}
+
+const {
+  buymeacoffee = 'nilatales',
+  patreon = 'nilatales',
+} = Astro.props;
+---
+
+<section class="py-10 md:py-14" aria-label="Support NilaTales">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="max-w-prose mx-auto text-center">
+
+      <div class="clay-card p-6 md:p-8 rounded-2xl bg-paper-100 border border-paper-200 flex flex-col gap-4 items-center">
+
+        <!-- Heart icon -->
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-50" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-rose)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l6 5.5z"/>
+          </svg>
+        </div>
+
+        <h2 class="font-rounded-ta text-xl md:text-2xl font-bold text-kohl-700">
+          நிலா கதைகளை ஆதரியுங்கள்
+        </h2>
+        <p class="font-rounded text-base text-kohl-500">
+          Support NilaTales
+        </p>
+        <p class="font-rounded text-sm text-kohl-500 leading-relaxed max-w-md">
+          Help us keep Tamil stories free for every child. Your support funds new stories, illustrations, and lullabies.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <a
+            href={`https://buymeacoffee.com/${buymeacoffee}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-clay-primary justify-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 8h1a4 4 0 1 1 0 8h-1M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4ZM6 2v2M10 2v2M14 2v2"/>
+            </svg>
+            Buy Me a Coffee
+          </a>
+          <a
+            href={`https://patreon.com/${patreon}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border-2 border-twilight-500 text-twilight-500 font-rounded font-semibold text-sm hover:bg-twilight-50 transition-colors min-h-[44px]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+            </svg>
+            Patreon
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

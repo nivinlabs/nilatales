@@ -1,0 +1,88 @@
+---
+/**
+ * SocialProof — NitviTalks YouTube + Instagram links section.
+ * Builds trust and cross-promotes the sister channel.
+ */
+const youtubeUrl = 'https://www.youtube.com/@NitviTalks';
+const instagramUrl = 'https://www.instagram.com/nitvitalks/';
+---
+
+<section id="social-proof" class="py-12 md:py-16" aria-label="From the creators of NitviTalks">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <div class="text-center mb-8">
+      <span class="font-rounded font-bold text-sm text-twilight-500">
+        நம்முடைய குடும்பம் · FROM THE CREATORS OF
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 clay-enter-stagger">
+
+      <!-- YouTube card -->
+      <a
+        href={youtubeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="clay-card flex flex-col gap-4 p-6 rounded-2xl bg-paper-50 border border-paper-200 hover:border-red-300 transition-colors duration-200 group"
+      >
+        <div class="flex items-center gap-3">
+          <span class="clay-raised inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-red-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="text-red-600" aria-hidden="true">
+              <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+              <path d="m10 15 5-3-5-3z"/>
+            </svg>
+          </span>
+          <div>
+            <h3 class="font-rounded font-bold text-lg text-kohl-900 group-hover:text-red-600 transition-colors">
+              NitviTalks on YouTube
+            </h3>
+            <p class="font-rounded text-sm text-kohl-500">
+              Tamil storytelling videos for kids
+            </p>
+          </div>
+        </div>
+        <p class="font-rounded-ta text-sm text-kohl-500 leading-relaxed">
+          குழந்தைகளுக்கான தமிழ் கதை வீடியோக்கள் — animated stories, Thirukkural explanations, and more.
+        </p>
+        <span class="font-rounded text-sm font-semibold text-red-600 group-hover:underline mt-auto flex items-center gap-1">
+          Watch on YouTube
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+      <!-- Instagram card -->
+      <a
+        href={instagramUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="clay-card flex flex-col gap-4 p-6 rounded-2xl bg-paper-50 border border-paper-200 hover:border-pink-300 transition-colors duration-200 group"
+      >
+        <div class="flex items-center gap-3">
+          <span class="clay-raised inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-pink-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="text-pink-600" aria-hidden="true">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+            </svg>
+          </span>
+          <div>
+            <h3 class="font-rounded font-bold text-lg text-kohl-900 group-hover:text-pink-600 transition-colors">
+              @nitvitalks on Instagram
+            </h3>
+            <p class="font-rounded text-sm text-kohl-500">
+              Story illustrations & activities
+            </p>
+          </div>
+        </div>
+        <p class="font-rounded-ta text-sm text-kohl-500 leading-relaxed">
+          கதை ஓவியங்கள், நிறமூழ்ய பக்கங்கள், மற்றும் குழந்தைகளுக்கான செயல்பாடுகள் — follow us for weekly updates!
+        </p>
+        <span class="font-rounded text-sm font-semibold text-pink-600 group-hover:underline mt-auto flex items-center gap-1">
+          Follow on Instagram
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+        </span>
+      </a>
+
+    </div>
+  </div>
+</section>

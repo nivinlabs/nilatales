@@ -1,4 +1,6 @@
-# Hostinger static hosting — _redirects file
-# Format: source destination [status]
+# Static hosting redirects
+# For Netlify/Vercel/Railway — serve custom 404 page
+# The 404.astro page is already built as /404.html
 
-# Old site or future moved routes go here. Currently none.
+# For Astro static output, the 404 page is at /404.html
+# Most hosts need explicit configuration; Railway serves it via the start script

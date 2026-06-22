@@ -1,0 +1,76 @@
+---
+/**
+ * AmazonAffiliate.astro — "Buy on Amazon" affiliate section for story pages.
+ *
+ * Displays recommended Tamil children's books with Amazon affiliate links.
+ * Positioned below the story body on story pages.
+ *
+ * Design: paper-100 card with twilight accent, matches NilaTales clay style.
+ */
+interface Props {
+  /** Book recommendations — array of { title, author?, asin?, url? } */
+  books?: Array<{ title: string; author?: string; asin?: string; url?: string }>;
+}
+
+const {
+  books = [
+    { title: 'Tamil Stories for Children', author: 'Various', asin: '8184515465' },
+    { title: 'Panchatantra Stories (Tamil)', author: 'Vishnu Sharma', asin: '9386416190' },
+    { title: 'Thirukkural for Kids', author: 'Various', asin: '9387550143' },
+  ],
+} = Astro.props;
+
+const amazonBase = 'https://www.amazon.in/dp/';
+const affiliateTag = 'nilatales-21'; // Amazon India affiliate tag
+---
+
+<section class="mt-12 pt-8 border-t border-paper-300" aria-label="Recommended books">
+  <div class="max-w-prose">
+    <div class="flex items-center gap-2 mb-4">
+      <div class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-amber)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="font-rounded-ta text-base font-bold text-kohl-700">படிக்க பரிந்துரைகள்</h2>
+        <p class="font-rounded text-xs text-kohl-500">Recommended Tamil books for kids</p>
+      </div>
+    </div>
+
+    <ul class="space-y-3" role="list">
+      {books.map((book) => {
+        const href = book.url ?? `${amazonBase}${book.asin}?tag=${affiliateTag}`;
+        return (
+          <li>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer sponsored"
+              class="flex items-center gap-4 p-4 rounded-xl bg-paper-100 border border-paper-200 hover:border-twilight-300 hover:bg-twilight-50 transition-colors group min-h-[44px]"
+            >
+              <div class="flex-shrink-0 w-10 h-14 rounded bg-paper-200 flex items-center justify-center" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-rounded-ta text-sm font-semibold text-kohl-700 group-hover:text-twilight-500 transition-colors truncate">
+                  {book.title}
+                </p>
+                {book.author && (
+                  <p class="font-rounded text-xs text-kohl-500">{book.author}</p>
+                )}
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-paper-400 group-hover:text-twilight-500 transition-colors" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <p class="font-rounded text-[0.6875rem] text-paper-400 mt-3 leading-relaxed">
+      As an Amazon Associate, NilaTales earns from qualifying purchases. Links above are affiliate links.
+    </p>
+  </div>
+</section>

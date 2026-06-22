@@ -1,0 +1,46 @@
+---
+/**
+ * PrintStoryButton.astro — "Print this story" button for story pages.
+ *
+ * Opens the browser print dialog with a print-optimized stylesheet.
+ * Added to story page sidebars and below story body on mobile.
+ *
+ * Design: sky-500 outlined pill button matching the Activity CTA style.
+ */
+interface Props {
+  /** Optional story title for the print dialog */
+  storyTitle?: string;
+}
+
+const { storyTitle = '' } = Astro.props;
+---
+
+<div class="print-story-button">
+  <button
+    type="button"
+    onclick={`window.print()${storyTitle ? `; /* ${storyTitle} */` : ''}`}
+    class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full border-2 text-sm font-semibold hover:bg-sky-50 transition-colors min-h-[44px]"
+    style="border-color: var(--color-sky); color: var(--color-sky)"
+    aria-label={`Print this story${storyTitle ? ': ' + storyTitle : ''}`}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="6 9 6 2 18 2 18 9"/>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+      <rect width="18" height="8" x="3" y="14" rx="2"/>
+    </svg>
+    <span class="font-rounded">Print this story</span>
+    <span class="font-rounded-ta text-xs opacity-70">கதையை அச்சிடு</span>
+  </button>
+</div>
+
+<style>
+  /* Print stylesheet: hide the print button itself when printing */
+  @media print {
+    .print-story-button { display: none !important; }
+    /* Remove decorative elements from print */
+    .clay-blob,
+    .clay-card,
+    .clay-raised,
+    .clay-comic { box-shadow: none !important; }
+  }
+</style>

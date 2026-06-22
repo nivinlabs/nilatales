@@ -1,0 +1,108 @@
+---
+/**
+ * RelatedStories — shows related stories based on the `related` frontmatter field.
+ * Falls back to stories of the same kind if no explicit relations exist.
+ */
+import StoryCard from './StoryCard.astro';
+import { publishedStories, storyRoute, resolveCover, idBasename } from '../utils/content';
+import type { CollectionEntry } from 'astro:content';
+
+type Story = CollectionEntry<'stories'>;
+
+interface Props {
+  currentStory: Story;
+  relatedIds?: string[];  // slugs from frontmatter `related` field
+  max?: number;
+}
+
+const { currentStory, relatedIds = [], max = 3 } = Astro.props;
+const allStories = await publishedStories();
+
+// Find explicitly related stories
+let related: Story[] = [];
+if (relatedIds.length > 0) {
+  const idSet = new Set(relatedIds);
+  related = allStories.filter(s => idSet.has(idBasename(s)));
+}
+
+// If not enough, fill with same-kind stories (excluding current)
+if (related.length < max) {
+  const sameKind = allStories.filter(
+    s => s.id !== currentStory.id && s.data.kind === currentStory.data.kind && !related.find(r => r.id === s.id)
+  );
+  related = [...related, ...sameKind].slice(0, max);
+}
+
+// Still not enough? Fill with any recent stories
+if (related.length < max) {
+  const others = allStories.filter(
+    s => s.id !== currentStory.id && !related.find(r => r.id === s.id)
+  );
+  related = [...related, ...others].slice(0, max);
+}
+
+if (related.length === 0) {
+  return;  // Don't render section if no related stories
+}
+
+function accentForKind(kind: string): string {
+  const map: Record<string, string> = {
+    moral: 'leaf', thirukkural: 'amber', panchatatantra: 'moss',
+    comic: 'rose', lullaby: 'violet', narration: 'violet',
+    activity: 'sky', 'teacher-guide': 'slate',
+  };
+  return map[kind] ?? 'leaf';
+}
+
+function readingTime(story: { data: { readingTimeMin?: number } }) {
+  return `${story.data.readingTimeMin ?? 5} min read`;
+}
+---
+
+<section class="mt-16 pt-8 border-t border-paper-300" aria-label="Related stories">
+  <h2 class="font-rounded-ta text-xl md:text-2xl font-bold text-kohl-900 mb-6">
+    இதுபோன்ற கதைகள் · More like this
+  </h2>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 clay-enter-stagger">
+    {related.map((story) => {
+      const cover = resolveCover(story.data.cover, { width: 400 });
+      const href = storyRoute(story);
+      const accent = accentForKind(story.data.kind ?? '');
+      return (
+        <a
+          href={href}
+          class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-1 transition-all duration-200 clay-card"
+          aria-label={story.data.title}
+        >
+          <div class="aspect-[4/3] overflow-hidden bg-paper-200">
+            {cover?.src
+              ? <img
+                  src={cover.src}
+                  alt={story.data.title}
+                  width={cover.width ?? 400}
+                  height={Math.round((cover.width ?? 400) * 3 / 4)}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-4xl" aria-hidden="true">📖</div>
+            }
+          </div>
+          <div class="flex flex-col gap-2 p-5">
+            <span class={`cat-pill cat-pill-${accent} w-fit`}>{story.data.kind?.toUpperCase()}</span>
+            <h3 class="font-rounded-ta font-bold text-lg text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+              {story.data.title}
+            </h3>
+            {story.data.summary && (
+              <p class="font-rounded text-sm text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
+            )}
+            <div class="flex items-center gap-2 mt-2">
+              {story.data.ageRange && <span class="chip">{story.data.ageRange.min}–{story.data.ageRange.max} yr</span>}
+              <span class="chip">{readingTime(story)}</span>
+            </div>
+          </div>
+        </a>
+      );
+    })}
+  </div>
+</section>
