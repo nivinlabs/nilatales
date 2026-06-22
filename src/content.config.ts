@@ -116,7 +116,7 @@ const stories = defineCollection({
       ageRange,
       readingTimeMin: z.number().int().positive(),
       difficulty: z.enum(['easy', 'medium', 'hard']).default('easy'),
-      language: z.enum(['ta', 'ta-en']).default('ta'),
+      language: z.enum(['ta', 'en', 'ta-en']).default('ta'),
 
       cover: img,
       coverAlt: z.string(),
@@ -163,7 +163,7 @@ const comics = defineCollection({
 
       ageRange,
       readingTimeMin: z.number().int().positive(),
-      language: z.enum(['ta', 'ta-en']).default('ta'),
+      language: z.enum(['ta', 'en', 'ta-en']).default('ta'),
 
       cover: img,
       coverAlt: z.string(),
@@ -232,7 +232,7 @@ const audio = defineCollection({
       narrationOf: reference('stories').optional(),
 
       ageRange: audioAgeRange,
-      language: z.enum(['ta', 'ta-en']).default('ta'),
+      language: z.enum(['ta', 'en', 'ta-en']).default('ta'),
       pubDate: z.coerce.date(),
       draft: z.boolean().default(false),
 
@@ -260,6 +260,7 @@ const activities = defineCollection({
       instructions: z.string(),
       instructionsEnglish: z.string().optional(),
 
+      language: z.enum(['ta', 'en', 'ta-en']).default('ta'),
       linkedStory: reference('stories'),
       related: z.array(reference('stories')).default([]),
       pubDate: z.coerce.date(),
@@ -274,6 +275,7 @@ const resources = defineCollection({
   schema: z.object({
     title: z.string(),
     kind: z.enum(['teacher-guide', 'parent-note', 'glossary']),
+    language: z.enum(['ta', 'en', 'ta-en']).default('ta'),
     ageRange,
     linkedStory: reference('stories').optional(),
 

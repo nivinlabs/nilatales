@@ -1,0 +1,78 @@
+---
+/**
+ * /en/panchatantra/ — Panchatantra Tales index (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedStories, storyRoute } from '../../../utils/content';
+
+const all = await publishedStories('en');
+const fables = all.filter((s) => s.data.kind === 'panchatantra');
+
+const tantraNames: Record<string, { tamil: string; english: string }> = {
+  mithrabheda:     { tamil: 'மித்ரபேதம்',     english: 'Loss of Friends' },
+  mithraLaapa:     { tamil: 'மித்ரலாபம்',     english: 'Gaining Friends' },
+  kaakolookiyam:   { tamil: 'காகோலூகியம்',   english: 'Crows & Owls' },
+  labdhapraNasham:{ tamil: 'லப்தப்ரணாசம்',  english: 'Lost Gains' },
+  apadhitthudai:   { tamil: 'அபதீத்துடை',   english: 'Ill-considered Action' },
+};
+
+const byTantra: Record<string, typeof fables> = {};
+for (const f of fables) {
+  const tantra = f.data.source?.kind === 'panchatantra' ? f.data.source.panchatantra.tantra : 'mithrabheda';
+  if (!byTantra[tantra]) byTantra[tantra] = [];
+  byTantra[tantra].push(f);
+}
+---
+
+<Layout
+  title="Panchatantra Tales"
+  description="Classic Panchatantra fables retold for children — the clever rabbit, the doves and the net, and more."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="🦊"
+    tamil="பஞ்சதந்திரம்"
+    english="Panchatantra Tales"
+    description="Ancient Indian fables of clever animals and wise lessons — retold for children, one tale at a time."
+    accentColor="moss"
+    count={fables.length}
+  />
+
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    {fables.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">Panchatantra stories coming soon.</p>
+    ) : (
+      <div class="space-y-12">
+        {Object.entries(byTantra).map(([tantra, items]) => (
+          items.length > 0 && (
+            <div>
+              <h2 class="font-rounded font-bold text-xl text-kohl-700 mb-4 flex items-center gap-2">
+                <span class="font-rounded-ta">{tantraNames[tantra]?.tamil ?? tantra}</span>
+                <span class="text-paper-400">·</span>
+                <span class="text-paper-500 text-sm">{tantraNames[tantra]?.english ?? tantra}</span>
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {items.map((s) => (
+                  <StoryCard
+                    href={`/en${storyRoute(s)}`}
+                    title={s.data.title}
+                    titleEnglish={s.data.titleEnglish}
+                    summary={s.data.summary}
+                    cover={s.data.cover}
+                    coverAlt={s.data.coverAlt}
+                    badge="PANCHATANTRA"
+                    accentColor="moss"
+                    readingTimeMin={s.data.readingTimeMin}
+                    ageRange={s.data.ageRange}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

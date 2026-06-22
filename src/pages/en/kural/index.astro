@@ -1,0 +1,78 @@
+---
+/**
+ * /en/kural/ — Thirukkural Tales index (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedStories, storyRoute } from '../../../utils/content';
+
+const all = await publishedStories('en');
+const kurals = all.filter((s) => s.data.kind === 'thirukkural');
+
+const byPaal: Record<string, typeof kurals> = { aram: [], porul: [], inbam: [] };
+for (const k of kurals) {
+  const paal = k.data.source?.kind === 'thirukkural' ? k.data.source.kural.paal : 'aram';
+  if (!byPaal[paal]) byPaal[paal] = [];
+  byPaal[paal].push(k);
+}
+
+const paalNames: Record<string, { tamil: string; english: string }> = {
+  aram:   { tamil: 'அறம்',   english: 'Virtue' },
+  porul:  { tamil: 'பொருள்',  english: 'Wealth' },
+  inbam:  { tamil: 'இன்பம்',  english: 'Love' },
+};
+---
+
+<Layout
+  title="Thirukkural Tales"
+  description="Valluvar's 1330 couplets, retold as short stories for children — one Kural at a time."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="📜"
+    tamil="திருக்குறள்"
+    english="Thirukkural Tales"
+    description="Valluvar's 1330 couplets, retold as short stories for children. Each couplet becomes a gentle tale about virtue, wealth, or love."
+    accentColor="amber"
+    count={kurals.length}
+  />
+
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    {kurals.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        Thirukkural stories coming soon.
+      </p>
+    ) : (
+      <div class="space-y-12">
+        {Object.entries(byPaal).map(([paal, items]) => (
+          items.length > 0 && (
+            <div>
+              <h2 class="font-rounded font-bold text-xl text-kohl-700 mb-4 flex items-center gap-2">
+                <span class="font-rounded-ta">{paalNames[paal]?.tamil}</span>
+                <span class="text-paper-400">·</span>
+                <span class="text-paper-500 text-sm">{paalNames[paal]?.english}</span>
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {items.map((s) => (
+                  <StoryCard
+                    href={`/en${storyRoute(s)}`}
+                    title={s.data.title}
+                    titleEnglish={s.data.titleEnglish}
+                    summary={s.data.summary}
+                    cover={s.data.cover}
+                    coverAlt={s.data.coverAlt}
+                    badge={`குறள் ${s.data.source?.kind === 'thirukkural' ? `#${s.data.source.kural.number}` : ''}`}
+                    accentColor="amber"
+                    readingTimeMin={s.data.readingTimeMin}
+                    ageRange={s.data.ageRange}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

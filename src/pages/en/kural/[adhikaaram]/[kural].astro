@@ -1,0 +1,31 @@
+---
+/**
+ * /en/kural/[adhigaaram]/[kural] — Canonical Kural route (English).
+ */
+import StoryPost from '../../../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories', ({ data }) =>
+    data.draft === false && data.language === 'en' && data.kind === 'thirukkural'
+  );
+  return stories
+    .filter((s) => s.data.source?.kind === 'thirukkural')
+    .map((story) => {
+      const k = story.data.source!.kural;
+      return {
+        params: { adhikaaram: String(k.adhigaaramNumber), kural: String(k.number) },
+        props: { story },
+      };
+    });
+}
+
+interface Props { story: CollectionEntry<'stories'>; }
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story} locale="en">
+  <Content />
+</StoryPost>

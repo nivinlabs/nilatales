@@ -1,15 +1,19 @@
 ---
 /**
- * Masthead.astro — clean brand header (no newspaper chrome).
- *
- * Logo mark + site name + tagline. Soft, rounded, claymorphism.
+ * Masthead.astro — clean brand header.
  */
+interface Props {
+  locale?: 'ta' | 'en';
+}
+const { locale = 'ta' } = Astro.props;
+const isEn = locale === 'en';
+const prefix = isEn ? '/en' : '';
 ---
 <header class="w-full bg-paper-50 pt-8 pb-4">
   <div class="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
 
     <!-- Logo + name -->
-    <a href="/" class="flex items-center gap-3 group" aria-label="NilaTales — Home">
+    <a href={`${prefix}/`} class="flex items-center gap-3 group" aria-label="NilaTales — Home">
       <!-- Moon logo mark (SVG) -->
       <span class="clay-raised flex items-center justify-center w-12 h-12 rounded-2xl bg-twilight-50 flex-shrink-0 group-hover:scale-105 transition-transform duration-200">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="text-twilight-500" aria-hidden="true">

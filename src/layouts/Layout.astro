@@ -1,12 +1,10 @@
 ---
 /**
  * Base layout for every NilaTales page.
- * Sets <html lang>, loads global styles (Tailwind v4 + design tokens), renders
- * Masthead + Nav + Colophon.
+ * Sets <html lang>, loads global styles, renders Masthead + Nav + Colophon.
  *
- * `lang` should be 'ta' for Tamil-first pages, 'ta-en' for bilingual.
- *
- * DESIGN.md §6 — Layout + Masthead + Nav + Colophon.
+ * `locale` controls language: 'ta' (Tamil, default) or 'en' (English).
+ * `lang` is kept for backward compat but locale takes precedence.
  */
 import '../styles/global.css';
 import Masthead from '../components/Masthead.astro';
@@ -17,6 +15,7 @@ interface Props {
   title: string;
   description?: string;
   lang?: 'ta' | 'ta-en' | 'en';
+  locale?: 'ta' | 'en';
   ogImage?: string;
   canonical?: string;
   bodyClass?: string;
@@ -26,19 +25,29 @@ interface Props {
 const {
   title,
   description = 'நிலா கதைகள் · NilaTales — Illustrated Tamil storytelling for children.',
-  lang = 'ta',
+  lang,
+  locale = 'ta',
   ogImage = '/img/og-default.jpg',
   canonical,
   bodyClass = '',
   showMasthead = true,
 } = Astro.props;
 
-const fullTitle = title.includes('NilaTales') ? title : `${title} · நிலா கதைகள்`;
+// locale takes precedence over lang
+const htmlLang = locale === 'en' ? 'en' : (lang === 'en' ? 'en' : 'ta');
+const isEn = htmlLang === 'en';
+
+const fullTitle = title.includes('NilaTales') ? title : `${title} · ${isEn ? 'NilaTales' : 'நிலா கதைகள்'}`;
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'https://nilatales.com').toString();
+
+// Compute alternate-language URL for hreflang
+const currentPath = Astro.url.pathname;
+const altPath = isEn ? currentPath.replace(/^\/en/, '') || '/' : `/en${currentPath}`;
+const altURL = new URL(altPath, Astro.site ?? 'https://nilatales.com').toString();
 ---
 
 <!doctype html>
-<html lang={lang === 'ta-en' ? 'ta' : lang} class="scroll-smooth">
+<html lang={htmlLang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,6 +57,10 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
 
+    <!-- hreflang: alternate language version -->
+    <link rel="alternate" hreflang={isEn ? 'ta' : 'en'} href={altURL} />
+    <link rel="alternate" hreflang={isEn ? 'en' : 'ta'} href={canonicalURL} />
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
@@ -55,14 +68,14 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
     <meta property="og:image" content={new URL(ogImage, Astro.site ?? 'https://nilatales.com').toString()} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:site_name" content="NilaTales" />
-    <meta property="og:locale" content="ta_IN" />
+    <meta property="og:locale" content={isEn ? 'en_US' : 'ta_IN'} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
 
-    <!-- Fraunces (display serif) + JetBrains Mono (editorial chrome) + Baloo 2 (rounded kid headings) -->
+    <!-- Fraunces (display serif) + JetBrains Mono + Baloo 2 (rounded kid headings) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -86,14 +99,14 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
       href="#main"
       class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-paper-50 focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:text-twilight-500 focus:outline-none"
     >
-      Skip to content
+      {isEn ? 'Skip to content' : 'உள்ளடக்கத்திற்குச் செல்'}
     </a>
 
     <!-- Brand header -->
-    {showMasthead && <Masthead />}
+    {showMasthead && <Masthead locale={locale} />}
 
     <!-- Sticky navigation -->
-    <Nav />
+    <Nav locale={locale} />
 
     <!-- Page content -->
     <main id="main" class="flex-1">
@@ -101,6 +114,6 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
     </main>
 
     <!-- Footer -->
-    <Colophon />
+    <Colophon locale={locale} />
   </body>
 </html>

@@ -10,9 +10,10 @@ import { idBasename } from '../utils/content';
 
 interface Props {
   post: CollectionEntry<'resources'>;
+  locale?: 'ta' | 'en';
 }
 
-const { post } = Astro.props;
+const { post, locale = 'ta' } = Astro.props;
 const data = post.data;
 
 // Astro 6: reference() returns {id, collection} — must explicitly resolve.
@@ -29,6 +30,7 @@ const kindBadge = {
   title={data.title}
   description={data.summary}
   lang="ta"
+  locale={locale}
 >
   <header class="pt-10 pb-6 bg-slate-50">
     <div class="max-w-3xl mx-auto px-4 sm:px-6">

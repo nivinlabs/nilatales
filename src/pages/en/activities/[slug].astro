@@ -1,0 +1,24 @@
+---
+/**
+ * /en/activities/[slug] — English activity page.
+ */
+import ActivityPost from '../../../layouts/ActivityPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const activities = await getCollection('activities', ({ data }) => data.draft === false && data.language === 'en');
+  return activities.map((a) => ({
+    params: { slug: idBasename(a) },
+    props: { entry: a },
+  }));
+}
+
+interface Props { entry: CollectionEntry<'activities'>; }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ActivityPost post={entry} locale="en">
+  <Content />
+</ActivityPost>

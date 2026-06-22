@@ -22,9 +22,10 @@ import { getEntry, type CollectionEntry } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'stories'>;
+  locale?: 'ta' | 'en';
 }
 
-const { post } = Astro.props;
+const { post, locale = 'ta' } = Astro.props;
 const data = post.data;
 
 // Accent class for kind
@@ -47,6 +48,7 @@ const teacherEntry = data.teacherGuide ? await getEntry(data.teacherGuide) : nul
   title={data.title}
   description={data.summary}
   lang={data.language === 'ta-en' ? 'ta-en' : 'ta'}
+  locale={locale}
   showMasthead={true}
 >
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10">

@@ -1,0 +1,48 @@
+---
+/**
+ * /en/activities/ — Printables index (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedActivities, idBasename } from '../../../utils/content';
+
+const entries = await publishedActivities('en');
+---
+
+<Layout
+  title="Activities — Coloring & Worksheets"
+  description="Printable coloring pages, worksheets, and crafts for children."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="🖍️"
+    tamil="விளையாட்டு"
+    english="Activities"
+    description="Printable coloring pages, worksheets, and crafts — fun activities linked to our stories."
+    accentColor="sky"
+    count={entries.length}
+  />
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+    {entries.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">Activities coming soon.</p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {entries.map((a) => (
+          <StoryCard
+            href={`/en/activities/${idBasename(a)}/`}
+            title={a.data.title}
+            titleEnglish={a.data.titleEnglish}
+            summary={a.data.instructions?.slice(0, 120) ?? ''}
+            cover={a.data.previewImage ?? ''}
+            coverAlt={a.data.title}
+            badge={a.data.kind?.toUpperCase()}
+            accentColor="sky"
+            ageRange={a.data.ageRange}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

@@ -14,9 +14,10 @@ import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'comics'>;
+  locale?: 'ta' | 'en';
 }
 
-const { post } = Astro.props;
+const { post, locale = 'ta' } = Astro.props;
 const data = post.data;
 
 // Resolve all pages at build time
@@ -47,6 +48,7 @@ const coverMeta = await resolveCover(data.cover, { width: 1600 });
   title={data.title}
   description={data.summary}
   lang={data.language === 'ta-en' ? 'ta-en' : 'ta'}
+  locale={locale}
 >
   <!-- ── Comic header ──────────────────────── -->
   <header class="pt-10 pb-8 bg-paper-100 border-b border-paper-300">

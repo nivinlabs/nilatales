@@ -1,0 +1,49 @@
+---
+/**
+ * /en/comics/ — Comic strips (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedComics, idBasename } from '../../../utils/content';
+
+const comics = await publishedComics('en');
+---
+
+<Layout
+  title="Comics"
+  description="Illustrated comics for children — strips, one-shots, and serials."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="🎨"
+    tamil="நகைச்சுவை"
+    english="Comics"
+    description="Funny comic strips and one-shots — silly moments, mischief, and giggles for young readers."
+    accentColor="rose"
+    count={comics.length}
+  />
+
+  <section class="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+    {comics.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">Comics coming soon.</p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {comics.map((comic) => (
+          <StoryCard
+            href={`/en/comics/${idBasename(comic)}/`}
+            title={comic.data.title}
+            titleEnglish={comic.data.titleEnglish}
+            summary={comic.data.summary}
+            cover={comic.data.cover}
+            coverAlt={comic.data.coverAlt}
+            badge={comic.data.format?.toUpperCase()}
+            accentColor="rose"
+            readingTimeMin={comic.data.readingTimeMin}
+            ageRange={comic.data.ageRange}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>

@@ -1,38 +1,51 @@
 ---
 /**
- * Nav.astro — sticky navigation with mobile drawer.
+ * Nav.astro — sticky navigation with mobile drawer + language switcher.
  *
- * Claymorphism design:
- *   - Paper-100 bg with hairline below
- *   - Category links + About + Bedtime toggle
- *   - Mobile: hamburger button opens slide-out drawer
+ * Language switcher: clay-pill toggle with "தமிழ்" and "EN" options.
+ * Active language is highlighted. Clicking the inactive one navigates
+ * to the equivalent page in the other language.
  */
+interface Props {
+  locale?: 'ta' | 'en';
+}
+const { locale = 'ta' } = Astro.props;
+
+const isEn = locale === 'en';
+const prefix = isEn ? '/en' : '';
+
+const navItems = [
+  { href: `${prefix}/stories/`,         label: 'கதைகள்',      en: 'Stories',       emoji: '📖' },
+  { href: `${prefix}/kural/`,           label: 'குறள்',        en: 'Kural',         emoji: '📜' },
+  { href: `${prefix}/panchatantra/`,    label: 'பஞ்சதந்திரம்', en: 'Panchatantra',  emoji: '🦊' },
+  { href: `${prefix}/comics/`,          label: 'நகைச்சுவை',   en: 'Comics',        emoji: '😄' },
+  { href: `${prefix}/listen/`,          label: 'கேட்க',        en: 'Listen',        emoji: '🎧' },
+  { href: `${prefix}/activities/`,      label: 'விளையாட்டு',   en: 'Activities',   emoji: '🖍️' },
+];
+
+// Language switcher: compute alternate URL
+const currentPath = Astro.url.pathname;
+const altPath = isEn ? (currentPath.replace(/^\/en/, '') || '/') : `/en${currentPath}`;
 ---
+
 <nav
   class="sticky top-0 z-40 bg-paper-100 border-b border-paper-300"
-  aria-label="Main navigation"
+  aria-label={isEn ? 'Main navigation' : 'பிரதான வழிசெலுத்தல்'}
 >
   <div class="max-w-5xl mx-auto px-4 sm:px-6">
     <div class="flex items-center justify-between gap-2 py-2">
 
       <!-- Category links (desktop) -->
       <ul class="hidden sm:flex items-center gap-1 list-none m-0 p-0" role="list">
-        {[
-          { href: '/stories/',         label: 'கதைகள்', en: 'Stories'       },
-          { href: '/kural/',           label: 'குறள்',   en: 'Kural'         },
-          { href: '/panchatantra/',    label: 'பஞ்சதந்திரம்', en: 'Panchatantra' },
-          { href: '/comics/',          label: 'நகைச்சுவை', en: 'Comics'       },
-          { href: '/listen/',          label: 'கேட்க',   en: 'Listen'        },
-          { href: '/activities/',     label: 'விளையாட்டு', en: 'Activities'  },
-        ].map(({ href, label, en }) => (
+        {navItems.map(({ href, label, en }) => (
           <li>
             <a
               href={href}
               class="flex flex-col items-center px-3 py-1 rounded-xl text-[0.7rem] font-rounded font-medium text-kohl-500 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[44px] justify-center whitespace-nowrap"
               aria-label={`${label} — ${en}`}
             >
-              <span class="font-rounded-ta text-[0.75rem] leading-none">{label}</span>
-              <span class="text-[10px] text-paper-400 font-rounded tracking-wide mt-0.5">{en}</span>
+              <span class="font-rounded-ta text-[0.75rem] leading-none">{isEn ? en : label}</span>
+              <span class="text-[10px] text-paper-400 font-rounded tracking-wide mt-0.5">{isEn ? label : en}</span>
             </a>
           </li>
         ))}
@@ -43,7 +56,7 @@
         id="nav-drawer-open"
         type="button"
         class="sm:hidden clay-card flex items-center justify-center w-10 h-10 rounded-xl bg-paper-50 border border-paper-300 text-kohl-700 min-h-[44px]"
-        aria-label="Open menu"
+        aria-label={isEn ? 'Open menu' : 'மெனுவைத் திற'}
         aria-expanded="false"
         aria-controls="nav-drawer"
       >
@@ -52,22 +65,53 @@
         </svg>
       </button>
 
-      <!-- Right side: About + Bedtime toggle -->
+      <!-- Right side: Language switcher + About + Bedtime toggle -->
       <div class="flex items-center gap-2 flex-shrink-0">
+
+        <!-- Language switcher (clay-pill toggle) -->
+        <div class="flex items-center gap-0.5 clay-card rounded-full bg-paper-50 border border-paper-300 p-0.5" role="group" aria-label="Language selector">
+          <a
+            href={isEn ? altPath : '#'}
+            class:list={[
+              'px-2.5 py-1 rounded-full text-[0.7rem] font-rounded font-semibold transition-all duration-150 min-h-[32px] flex items-center',
+              !isEn
+                ? 'bg-twilight-500 text-white shadow-sm'
+                : 'text-kohl-500 hover:text-twilight-500'
+            ]}
+            aria-current={!isEn ? 'true' : undefined}
+            aria-label="Tamil"
+          >
+            தமிழ்
+          </a>
+          <a
+            href={isEn ? '#' : altPath}
+            class:list={[
+              'px-2.5 py-1 rounded-full text-[0.7rem] font-rounded font-semibold transition-all duration-150 min-h-[32px] flex items-center',
+              isEn
+                ? 'bg-twilight-500 text-white shadow-sm'
+                : 'text-kohl-500 hover:text-twilight-500'
+            ]}
+            aria-current={isEn ? 'true' : undefined}
+            aria-label="English"
+          >
+            EN
+          </a>
+        </div>
+
         <a
-          href="/about/"
-          class="px-3 py-1 rounded-xl text-[0.7rem] font-rounded font-medium text-kohl-500 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[44px] flex items-center justify-center"
+          href={`${prefix}/about/`}
+          class="hidden md:flex px-3 py-1 rounded-xl text-[0.7rem] font-rounded font-medium text-kohl-500 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[44px] items-center justify-center"
           aria-label="About"
         >
           About
         </a>
 
-        <!-- Bedtime Mode toggle chip (clay-card) -->
+        <!-- Bedtime Mode toggle chip -->
         <button
           id="bedtime-toggle"
           type="button"
           class="clay-card flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-paper-50 border border-paper-300 text-[0.7rem] font-rounded font-semibold text-kohl-700 hover:text-twilight-500 transition-colors duration-150 min-h-[36px]"
-          aria-label="Toggle Bedtime Mode"
+          aria-label={isEn ? 'Toggle Bedtime Mode' : 'இரவு பயன்முறை'}
           aria-pressed="false"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -79,7 +123,7 @@
   </div>
 
   <!-- Mobile slide-out drawer -->
-  <div id="nav-drawer" class="fixed inset-0 z-50 sm:hidden hidden" role="dialog" aria-modal="true" aria-label="Site menu">
+  <div id="nav-drawer" class="fixed inset-0 z-50 sm:hidden hidden" role="dialog" aria-modal="true" aria-label={isEn ? 'Site menu' : 'தள மெனு'}>
     <!-- Backdrop -->
     <div id="nav-drawer-backdrop" class="absolute inset-0 bg-kohl-900/40 backdrop-blur-sm"></div>
     <!-- Drawer panel -->
@@ -91,43 +135,70 @@
           id="nav-drawer-close"
           type="button"
           class="clay-card flex items-center justify-center w-9 h-9 rounded-xl bg-paper-100 border border-paper-300 text-kohl-700"
-          aria-label="Close menu"
+          aria-label={isEn ? 'Close menu' : 'மெனுவை மூடு'}
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
+      <!-- Language switcher in drawer -->
+      <div class="px-4 py-3 border-b border-paper-200">
+        <p class="font-rounded text-xs text-paper-400 mb-2">{isEn ? 'Language' : 'மொழி'}</p>
+        <div class="flex items-center gap-0.5 clay-card rounded-full bg-paper-100 border border-paper-300 p-0.5 w-fit">
+          <a
+            href={isEn ? altPath : '#'}
+            class:list={['px-3 py-1.5 rounded-full text-xs font-rounded font-semibold transition-all', !isEn ? 'bg-twilight-500 text-white' : 'text-kohl-500']}
+          >
+            தமிழ்
+          </a>
+          <a
+            href={isEn ? '#' : altPath}
+            class:list={['px-3 py-1.5 rounded-full text-xs font-rounded font-semibold transition-all', isEn ? 'bg-twilight-500 text-white' : 'text-kohl-500']}
+          >
+            English
+          </a>
+        </div>
+      </div>
       <!-- Drawer links -->
       <ul class="flex-1 list-none m-0 p-2 overflow-y-auto">
-        {[
-          { href: '/stories/',         label: 'கதைகள்', en: 'Stories'       },
-          { href: '/kural/',           label: 'குறள்',   en: 'Kural'         },
-          { href: '/panchatantra/',    label: 'பஞ்சதந்திரம்', en: 'Panchatantra' },
-          { href: '/comics/',          label: 'நகைச்சுவை', en: 'Comics'       },
-          { href: '/listen/',          label: 'கேட்க',   en: 'Listen'        },
-          { href: '/activities/',     label: 'விளையாட்டு', en: 'Activities'  },
-          { href: '/grownups/',        label: 'ஆசிரியர்', en: 'For Grown-ups' },
-          { href: '/about/',           label: 'About',   en: 'About'         },
-        ].map(({ href, label, en }) => (
+        {navItems.map(({ href, label, en }) => (
           <li>
             <a
               href={href}
               class="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-rounded font-medium text-kohl-700 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[48px]"
               aria-label={`${label} — ${en}`}
             >
-              <span class="font-rounded-ta text-base">{label}</span>
-              <span class="text-xs text-paper-400">{en}</span>
+              <span class="font-rounded-ta text-base">{isEn ? en : label}</span>
+              <span class="text-xs text-paper-400">{isEn ? label : en}</span>
             </a>
           </li>
         ))}
+        <li>
+          <a
+            href={`${prefix}/grownups/`}
+            class="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-rounded font-medium text-kohl-700 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[48px]"
+          >
+            <span class="font-rounded-ta text-base">{isEn ? 'For Grown-ups' : 'ஆசிரியர்'}</span>
+            <span class="text-xs text-paper-400">{isEn ? 'ஆசிரியர்' : 'For Grown-ups'}</span>
+          </a>
+        </li>
+        <li>
+          <a
+            href={`${prefix}/about/`}
+            class="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-rounded font-medium text-kohl-700 hover:text-twilight-500 hover:bg-twilight-50 transition-colors duration-150 min-h-[48px]"
+          >
+            <span class="font-rounded-ta text-base">{isEn ? 'About' : 'பற்றி'}</span>
+            <span class="text-xs text-paper-400">{isEn ? 'பற்றி' : 'About'}</span>
+          </a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
 
 <script>
-  // Bedtime Mode: toggle dark theme via CSS variables on <html>
+  // Bedtime Mode: toggle dark theme
   const btn = document.getElementById('bedtime-toggle');
   if (btn) {
     btn.addEventListener('click', () => {
@@ -137,7 +208,7 @@
     });
   }
 
-  // Nav active state — mark current section
+  // Nav active state
   const navLinks = document.querySelectorAll('nav a[href]');
   const currentPath = window.location.pathname;
   navLinks.forEach((link) => {
@@ -147,7 +218,7 @@
     }
   });
 
-  // Mobile drawer open/close
+  // Mobile drawer
   const drawer = document.getElementById('nav-drawer');
   const openBtn = document.getElementById('nav-drawer-open');
   const closeBtn = document.getElementById('nav-drawer-close');
@@ -171,12 +242,10 @@
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
   if (backdrop) backdrop.addEventListener('click', closeDrawer);
 
-  // Close drawer on link click
   drawer?.querySelectorAll('a[href]').forEach((link) => {
     link.addEventListener('click', closeDrawer);
   });
 
-  // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && drawer && !drawer.classList.contains('hidden')) {
       closeDrawer();

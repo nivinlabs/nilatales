@@ -1,0 +1,30 @@
+---
+/**
+ * /en/stories/[...slug] — English story dispatcher.
+ */
+import StoryPost from '../../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idWithoutExt } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories', ({ data }) =>
+    data.draft === false && data.language === 'en'
+  );
+
+  return stories.map((story) => ({
+    params: { slug: idWithoutExt(story) },
+    props: { story },
+  }));
+}
+
+interface Props {
+  story: CollectionEntry<'stories'>;
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story} locale="en">
+  <Content />
+</StoryPost>

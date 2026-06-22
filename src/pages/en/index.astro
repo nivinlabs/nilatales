@@ -1,0 +1,382 @@
+---
+/**
+ * /en/ — English homepage.
+ * Mirrors the Tamil homepage but filters content by language='en'.
+ */
+import Layout from '../../layouts/Layout.astro';
+import StoryCard from '../../components/StoryCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import KuralBand from '../../components/KuralBand.astro';
+import CategoryPill from '../../components/CategoryPill.astro';
+import PlayButton from '../../components/PlayButton.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import SocialProof from '../../components/SocialProof.astro';
+import FeaturedStory from '../../components/FeaturedStory.astro';
+import YouTubeEmbed from '../../components/YouTubeEmbed.astro';
+import InstagramFeed from '../../components/InstagramFeed.astro';
+import PremiumStories from '../../components/PremiumStories.astro';
+import SupportSection from '../../components/SupportSection.astro';
+import AdSensePlaceholder from '../../components/AdSensePlaceholder.astro';
+import { publishedStories, publishedComics, publishedAudio, publishedActivities, storyRoute, resolveCover, idBasename } from '../../utils/content';
+
+const stories   = await publishedStories('en');
+const comics    = await publishedComics('en');
+const audio     = await publishedAudio('en');
+const activities = await publishedActivities('en');
+
+const heroStory = stories.find((s) => s.data.featured) ?? stories[0];
+
+const kurals = stories.filter((s) => s.data.kind === 'thirukkural');
+const kuralStory = kurals.find((s) => s.data.featured) ?? kurals[0];
+
+const pillars = [
+  { emoji: '🌙', cat: 'leaf',   label: 'Stories',      en: 'கதைகள்',  href: '/en/stories/',    count: stories.filter(s => s.data.kind !== 'thirukkural' && s.data.kind !== 'panchatantra').length },
+  { emoji: '📜', cat: 'amber',  label: 'Kural',        en: 'குறள்',    href: '/en/kural/',      count: kurals.length },
+  { emoji: '📚', cat: 'moss',   label: 'Panchatantra', en: 'பஞ்சதந்திரம்', href: '/en/panchatantra/', count: stories.filter(s => s.data.kind === 'panchatantra').length },
+  { emoji: '🎨', cat: 'rose',   label: 'Comics',      en: 'நகைச்சுவை', href: '/en/comics/',     count: comics.length },
+  { emoji: '🎧', cat: 'violet', label: 'Listen',       en: 'கேட்க',    href: '/en/listen/',     count: audio.length },
+  { emoji: '🖍️', cat: 'sky',    label: 'Activities',   en: 'விளையாட்டு', href: '/en/activities/', count: activities.length },
+];
+
+const featuredStories = stories
+  .filter((s) => s.id !== heroStory?.id)
+  .slice(0, 3);
+
+const listenItems = audio.slice(0, 4);
+
+const recentStories = stories
+  .filter((s) => s.id !== heroStory?.id)
+  .slice(3, 8);
+
+function accentForKind(kind: string): string {
+  const map: Record<string, string> = {
+    moral: 'leaf', thirukkural: 'amber', panchatatantra: 'moss',
+    comic: 'rose', lullaby: 'violet', narration: 'violet',
+    activity: 'sky', 'teacher-guide': 'slate',
+  };
+  return map[kind] ?? 'leaf';
+}
+
+function readingTime(story: { data: { body?: string } }) {
+  const words = (story.data.body ?? '').split(/\s+/).length;
+  return `${Math.ceil(words / 150)} min read`;
+}
+---
+
+<Layout
+  title="NilaTales — Illustrated Bedtime Stories for Children"
+  description="Illustrated bedtime stories for children. Moral tales, Thirukkural, Panchatantra, comics, lullabies, and activities."
+  locale="en"
+>
+
+  <!-- HERO -->
+  {heroStory && (
+    <section id="hero" class="py-8 md:py-14 relative overflow-hidden" aria-label="Tonight's Tale">
+      <div class="clay-blob clay-blob-lilac" style="width: 300px; height: 300px; top: -60px; right: -40px;" aria-hidden="true"></div>
+      <div class="clay-blob clay-blob-peach clay-blob-2" style="width: 250px; height: 250px; bottom: -40px; left: -60px;" aria-hidden="true"></div>
+      <div class="clay-blob clay-blob-mint clay-blob-3" style="width: 200px; height: 200px; top: 40%; left: 45%;" aria-hidden="true"></div>
+
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center clay-enter">
+
+          <a
+            href={`/en${storyRoute(heroStory)}`}
+            class="clay-raised rounded-3xl overflow-hidden block aspect-[4/5] relative group"
+            aria-label={`Cover for ${heroStory.data.title}`}
+          >
+            {(() => {
+              const cover = resolveCover(heroStory.data.cover, { width: 600 });
+              return cover?.src
+                ? <img src={cover.src} alt={heroStory.data.title} width={cover.width ?? 600} height={Math.round((cover.width ?? 600) * 5 / 4)} class="w-full h-full object-cover" loading="eager" />
+                : <div class="w-full h-full bg-twilight-50 flex items-center justify-center"><span class="text-6xl">🌙</span></div>;
+            })()}
+            <div class="absolute inset-0 bg-kohl-900/0 group-hover:bg-kohl-900/20 transition-colors duration-300" aria-hidden="true"></div>
+          </a>
+
+          <div class="flex flex-col gap-4">
+            <span class="font-rounded font-bold text-sm text-twilight-500">
+              ✨ Tonight's Tale
+            </span>
+
+            <h1 class="font-rounded-ta text-4xl md:text-5xl font-bold text-kohl-900 leading-tight tracking-tight">
+              {heroStory.data.title}
+            </h1>
+
+            {heroStory.data.subtitle && (
+              <p class="font-rounded-ta text-lg md:text-xl text-kohl-500 leading-snug">
+                {heroStory.data.subtitle}
+              </p>
+            )}
+
+            <div class="flex items-center gap-2">
+              <span class="chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                {heroStory.data.ageRange ? `${heroStory.data.ageRange.min}–${heroStory.data.ageRange.max}` : '3–8'} yr
+              </span>
+              <span class="chip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                {readingTime(heroStory)}
+              </span>
+              {heroStory.data.kind && (
+                <span class={`cat-pill cat-pill-${accentForKind(heroStory.data.kind)}`}>
+                  {heroStory.data.kind.toUpperCase()}
+                </span>
+              )}
+            </div>
+
+            {heroStory.data.summary && (
+              <p class="font-rounded text-base text-kohl-500 leading-relaxed line-clamp-3">
+                {heroStory.data.summary}
+              </p>
+            )}
+
+            <a
+              href={`/en${storyRoute(heroStory)}`}
+              class="btn-clay-primary self-start flex items-center gap-2 mt-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              Read tonight
+            </a>
+
+            {audio.find(a => a.data.title === heroStory.data.title) && (
+              <a
+                href={`/en/listen/${idBasename(audio.find(a => a.data.title === heroStory.data.title)!)}/`}
+                class="flex items-center gap-2 font-rounded text-sm font-semibold text-twilight-500 hover:text-twilight-700 transition-colors min-h-[44px]"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
+                🎧 Listen instead
+              </a>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- SIX PILLARS -->
+  <section id="pillars" class="py-12 md:py-16" aria-label="Six Pillars">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+      <SectionHeader eyebrow="EXPLORE" tamil="Categories" />
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 clay-enter-stagger">
+        {pillars.map(({ emoji, cat, label, en, href, count }) => (
+          <a
+            href={href}
+            class="clay-card flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
+            aria-label={`${label} (${count} items)`}
+          >
+            <span
+              class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl"
+              style={`background: rgba(var(--color-${cat}), 0.12)`}
+              aria-hidden="true"
+            >
+              {emoji}
+            </span>
+            <div>
+              <p class="font-rounded-ta text-base font-semibold text-kohl-700 leading-none">{label}</p>
+              <p class="font-rounded text-xs font-medium text-paper-400 mt-0.5">{en}</p>
+            </div>
+            <p class="font-rounded text-xs text-paper-400 mt-auto">
+              {count > 0 ? `${count} ${count === 1 ? 'item' : 'items'}` : 'Coming soon'}
+            </p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- KURAL OF THE WEEK -->
+  {kuralStory && kuralStory.data.source?.kural && (
+    <KuralBand
+      couplet={kuralStory.data.source.kural.coupletTamil ?? kuralStory.data.source.kural.tamil ?? ''}
+      transliteration={kuralStory.data.source.kural.transliteration ?? ''}
+      meaning={kuralStory.data.source.kural.meaningEnglish ?? kuralStory.data.source.kural.meaning?.en ?? ''}
+      storyHref={`/en${storyRoute(kuralStory)}`}
+      storyLabel="Read the story"
+    />
+  )}
+
+  <!-- FEATURED STORIES -->
+  {featuredStories.length > 0 && (
+    <section id="featured" class="py-12 md:py-16" aria-label="Featured Stories">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+        <SectionHeader eyebrow="FEATURED" tamil="Best Stories" href="/en/stories/" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 clay-enter-stagger">
+          {featuredStories.map((story) => {
+            const cover = resolveCover(story.data.cover, { width: 400 });
+            const href  = `/en${storyRoute(story)}`;
+            const accent = accentForKind(story.data.kind ?? '');
+            return (
+              <a
+                href={href}
+                class="group flex flex-col rounded-2xl bg-paper-100 border border-paper-200 overflow-hidden hover:-translate-y-1 transition-all duration-200 clay-card"
+                aria-label={story.data.title}
+              >
+                <div class="aspect-[4/3] overflow-hidden bg-paper-200">
+                  {cover?.src
+                    ? <img src={cover.src} alt={story.data.title} width={cover.width ?? 400} height={Math.round((cover.width ?? 400) * 3 / 4)} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-4xl" aria-hidden="true">📖</div>
+                  }
+                </div>
+                <div class="flex flex-col gap-2 p-5">
+                  <span class={`cat-pill cat-pill-${accent} w-fit`}>{story.data.kind?.toUpperCase()}</span>
+                  <h3 class="font-rounded-ta font-bold text-lg text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                    {story.data.title}
+                  </h3>
+                  {story.data.summary && (
+                    <p class="font-rounded text-sm text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
+                  )}
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="chip">{story.data.ageRange ? `${story.data.ageRange.min}–${story.data.ageRange.max}` : '3–8'} yr</span>
+                    <span class="chip">{readingTime(story)}</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- LISTEN STRIP -->
+  {listenItems.length > 0 && (
+    <section id="listen" class="py-12 md:py-16" aria-label="Listen">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="flex items-end justify-between mb-6 gap-4">
+          <div class="flex flex-col gap-1">
+            <span class="font-rounded font-bold text-sm text-twilight-500 tracking-wide">LISTEN</span>
+            <span class="font-rounded-ta text-lg text-kohl-700">Stories to listen to</span>
+          </div>
+          <a href="/en/listen/" class="flex items-center gap-1 text-sm font-rounded font-semibold text-twilight-500 hover:text-twilight-700 whitespace-nowrap min-h-[44px] justify-center transition-colors duration-150">
+            All audio →
+          </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 clay-enter-stagger">
+          {listenItems.map((a) => (
+            <a
+              href={`/en/listen/${idBasename(a)}/`}
+              class="clay-card flex flex-col gap-3 p-4 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 group"
+            >
+              <div class="flex items-center gap-3">
+                <PlayButton />
+                <div class="flex-1 min-w-0">
+                  <p class="font-rounded-ta font-bold text-sm text-kohl-700 group-hover:text-twilight-500 transition-colors truncate">
+                    {a.data.title}
+                  </p>
+                  <p class="font-rounded text-xs text-paper-400 capitalize">{a.data.type}</p>
+                </div>
+              </div>
+              {a.data.audioAgeRange && (
+                <span class="chip">{a.data.audioAgeRange}+ yr</span>
+              )}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- COMICS STRIP -->
+  {comics.length > 0 && (
+    <section id="comics" class="py-12 md:py-16" aria-label="Comics">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <SectionHeader eyebrow="COMICS" tamil="Comics" href="/en/comics/" />
+        <div class="flex gap-5 overflow-x-auto scroll-snap-x scroll-fade-edges pb-4 -mx-4 px-4">
+          {comics.map((comic, i) => {
+            const cover = resolveCover(comic.data.cover, { width: 360 });
+            const href  = `/en/comics/${idBasename(comic)}/`;
+            return (
+              <a
+                href={href}
+                class:list={['scroll-snap-item flex-shrink-0 w-[260px] flex flex-col gap-3', 'clay-comic rounded-3xl bg-paper-50 border border-paper-200 overflow-hidden', 'group hover:-translate-y-1 transition-all duration-200']}
+                aria-label={comic.data.title}
+              >
+                <div class="aspect-[4/5] overflow-hidden bg-paper-200 p-3 pb-0">
+                  {cover?.src
+                    ? <img src={cover.src} alt={comic.data.title} width={360} height={450} class="w-full h-full object-cover rounded-2xl" loading="lazy" />
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-5xl rounded-xl" aria-hidden="true">🎨</div>
+                  }
+                </div>
+                <div class="p-4 pt-2 flex flex-col gap-1">
+                  <p class="font-rounded text-xs text-paper-400 uppercase tracking-wide">
+                    Strip {String(i + 1).padStart(2, '0')}
+                  </p>
+                  <h3 class="font-rounded-ta font-bold text-base text-kohl-700 leading-snug group-hover:text-twilight-500 transition-colors">
+                    {comic.data.title}
+                  </h3>
+                  {comic.data.summary && (
+                    <p class="font-rounded text-sm text-kohl-500 line-clamp-2">{comic.data.summary}</p>
+                  )}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- RECENT STORIES -->
+  {recentStories.length > 0 && (
+    <section id="recent" class="py-12 md:py-16" aria-label="Recent Stories">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <SectionHeader eyebrow="RECENT" tamil="Recent Stories" href="/en/stories/" />
+        <ul class="divide-y divide-paper-200" role="list">
+          {recentStories.map((story) => {
+            const href   = `/en${storyRoute(story)}`;
+            const accent = accentForKind(story.data.kind ?? '');
+            return (
+              <li class="border-b border-paper-200 last:border-b-0">
+                <a href={href} class="flex items-start gap-4 py-4 hover:bg-paper-100 -mx-4 px-4 transition-colors duration-150 group">
+                  <div class="flex-shrink-0 w-0.5 self-stretch rounded-full mt-1" style={`background-color: var(--color-${accent})`} aria-hidden="true"></div>
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-rounded-ta font-bold text-base text-kohl-700 group-hover:text-twilight-500 transition-colors leading-snug mb-1">
+                      {story.data.title}
+                    </h3>
+                    {story.data.summary && (
+                      <p class="font-rounded text-sm text-kohl-500 line-clamp-1">{story.data.summary}</p>
+                    )}
+                  </div>
+                  <time datetime={story.data.pubDate.toISOString()} class="font-rounded text-xs text-paper-400 flex-shrink-0 mt-1 whitespace-nowrap">
+                    {story.data.pubDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </time>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- SOCIAL PROOF -->
+  <SocialProof />
+
+  <!-- YOUTUBE -->
+  <YouTubeEmbed />
+
+  <!-- INSTAGRAM -->
+  <InstagramFeed />
+
+  <!-- ADSENSE -->
+  <AdSensePlaceholder format="horizontal" slotId="nilatales-en-home-bottom" />
+
+  <!-- PREMIUM -->
+  <PremiumStories />
+
+  <!-- NEWSLETTER -->
+  <NewsletterSignup
+    headingTa="Never miss a story"
+    headingEn="Get new stories every week"
+    subtitle="Get new bedtime stories delivered to your inbox every week."
+  />
+
+  <!-- SUPPORT -->
+  <SupportSection />
+
+</Layout>

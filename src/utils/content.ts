@@ -25,7 +25,11 @@ export type Resource = CollectionEntry<'resources'>;
  * paths like `panchatantra/the-doves-and-the-net`).
  */
 export function idWithoutExt<T extends { id: string }>(entry: T): string {
-  return entry.id.replace(/\.[^./]+$/, '');
+  // Astro 6 glob loader: entry.id is the relative path from the collection base
+  // with the file extension stripped. We use locale subdirectories (ta/ en/)
+  // so we need to strip the locale prefix too.
+  // e.g. "ta/moral/the-moon-who-learned-to-share" → "moral/the-moon-who-learned-to-share"
+  return entry.id.replace(/^(ta|en)\//, '');
 }
 
 /**
@@ -42,7 +46,9 @@ export function idWithoutExt<T extends { id: string }>(entry: T): string {
  * where the file may live in a subfolder of the collection root.
  */
 export function idBasename<T extends { id: string }>(entry: T): string {
-  const noExt = entry.id.replace(/\.[^./]+$/, '');
+  // Strip locale prefix (ta/ en/) and get the basename without extension
+  const noLocale = entry.id.replace(/^(ta|en)\//, '');
+  const noExt = noLocale.replace(/\.[^./]+$/, '');
   return noExt.split('/').pop() ?? noExt;
 }
 
@@ -68,38 +74,48 @@ export async function resolveCover(
   };
 }
 
-export async function publishedStories(includeDrafts = false): Promise<Story[]> {
-  const all = await getCollection('stories', ({ data }) =>
-    includeDrafts ? true : data.draft === false,
-  );
+export async function publishedStories(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Story[]> {
+  const all = await getCollection('stories', ({ data }) => {
+    if (!includeDrafts && data.draft === false) return false;
+    if (data.language !== locale && data.language !== 'ta-en') return false;
+    return true;
+  });
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
-export async function publishedComics(includeDrafts = false): Promise<Comic[]> {
-  const all = await getCollection('comics', ({ data }) =>
-    includeDrafts ? true : data.draft === false,
-  );
+export async function publishedComics(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Comic[]> {
+  const all = await getCollection('comics', ({ data }) => {
+    if (!includeDrafts && data.draft === false) return false;
+    if (data.language !== locale && data.language !== 'ta-en') return false;
+    return true;
+  });
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
-export async function publishedAudio(includeDrafts = false): Promise<Audio[]> {
-  const all = await getCollection('audio', ({ data }) =>
-    includeDrafts ? true : data.draft === false,
-  );
+export async function publishedAudio(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Audio[]> {
+  const all = await getCollection('audio', ({ data }) => {
+    if (!includeDrafts && data.draft === false) return false;
+    if (data.language !== locale && data.language !== 'ta-en') return false;
+    return true;
+  });
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
-export async function publishedActivities(includeDrafts = false): Promise<Activity[]> {
-  const all = await getCollection('activities', ({ data }) =>
-    includeDrafts ? true : data.draft === false,
-  );
+export async function publishedActivities(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Activity[]> {
+  const all = await getCollection('activities', ({ data }) => {
+    if (!includeDrafts && data.draft === false) return false;
+    if (data.language !== locale && data.language !== 'ta-en') return false;
+    return true;
+  });
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
-export async function publishedResources(includeDrafts = false): Promise<Resource[]> {
-  const all = await getCollection('resources', ({ data }) =>
-    includeDrafts ? true : data.draft === false,
-  );
+export async function publishedResources(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Resource[]> {
+  const all = await getCollection('resources', ({ data }) => {
+    if (!includeDrafts && data.draft === false) return false;
+    if (data.language !== locale && data.language !== 'ta-en') return false;
+    return true;
+  });
   return all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 

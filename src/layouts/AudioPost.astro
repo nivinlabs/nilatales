@@ -13,9 +13,10 @@ import { getEntry, type CollectionEntry } from 'astro:content';
 
 interface Props {
   post: CollectionEntry<'audio'>;
+  locale?: 'ta' | 'en';
 }
 
-const { post } = Astro.props;
+const { post, locale = 'ta' } = Astro.props;
 const data = post.data;
 
 // Resolve linked story
@@ -31,6 +32,7 @@ const durationLabel = data.durationSec
   title={data.title}
   description={data.lyrics ?? `${data.type} — ${data.title}`}
   lang={data.language === 'ta-en' ? 'ta-en' : 'ta'}
+  locale={locale}
 >
   <!-- ── Header ──────────────────────────── -->
   <header class="pt-10 pb-8 bg-twilight-50 border-b border-paper-300">

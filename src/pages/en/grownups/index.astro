@@ -1,0 +1,62 @@
+---
+/**
+ * /en/grownups/ — Resources for parents and teachers (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedResources, idBasename } from '../../../utils/content';
+
+const entries = await publishedResources('en');
+const guides    = entries.filter((r) => r.data.kind === 'teacher-guide');
+const parent    = entries.filter((r) => r.data.kind === 'parent-note');
+const glossaries = entries.filter((r) => r.data.kind === 'glossary');
+---
+
+<Layout
+  title="For Grown-ups — Teacher Guides & Parent Notes"
+  description="Teacher guides, parent notes, and glossaries for reading NilaTales with children."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="👨‍🏫"
+    tamil="ஆசிரியர் & பெற்றோர்"
+    english="For Grown-ups"
+    description="Teacher guides, parent notes, and glossaries — everything you need to read NilaTales with children."
+    accentColor="slate"
+    count={entries.length}
+  />
+
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-12">
+    {guides.length > 0 && (
+      <div>
+        <h2 class="font-rounded font-bold text-xl text-kohl-700 mb-4">Teacher Guides</h2>
+        <div class="space-y-3">
+          {guides.map((r) => (
+            <a href={`/en/grownups/${idBasename(r)}/`} class="clay-card flex items-center gap-4 p-4 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-colors group">
+              <span class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg">👩‍🏫</span>
+              <p class="font-rounded font-bold text-sm text-kohl-700 group-hover:text-twilight-500 transition-colors">{r.data.title}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {parent.length > 0 && (
+      <div>
+        <h2 class="font-rounded font-bold text-xl text-kohl-700 mb-4">Parent Notes</h2>
+        <div class="space-y-3">
+          {parent.map((r) => (
+            <a href={`/en/grownups/${idBasename(r)}/`} class="clay-card flex items-center gap-4 p-4 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-colors group">
+              <span class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg">👪</span>
+              <p class="font-rounded font-bold text-sm text-kohl-700 group-hover:text-twilight-500 transition-colors">{r.data.title}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {entries.length === 0 && (
+      <p class="text-slate-500 italic text-center py-12">Resources coming soon.</p>
+    )}
+  </section>
+</Layout>

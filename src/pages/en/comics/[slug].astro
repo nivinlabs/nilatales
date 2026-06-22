@@ -1,0 +1,24 @@
+---
+/**
+ * /en/comics/[slug] — English comic page.
+ */
+import ComicPost from '../../../layouts/ComicPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const comics = await getCollection('comics', ({ data }) => data.draft === false && data.language === 'en');
+  return comics.map((comic) => ({
+    params: { slug: idBasename(comic) },
+    props: { comic },
+  }));
+}
+
+interface Props { comic: CollectionEntry<'comics'>; }
+const { comic } = Astro.props;
+const { Content } = await render(comic);
+---
+
+<ComicPost post={comic} locale="en">
+  <Content />
+</ComicPost>

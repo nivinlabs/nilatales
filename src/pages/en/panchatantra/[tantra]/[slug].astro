@@ -1,0 +1,31 @@
+---
+/**
+ * /en/panchatantra/[tantra]/[slug] — Canonical Panchatantra route (English).
+ */
+import StoryPost from '../../../../layouts/StoryPost.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { idBasename } from '../../../../utils/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories', ({ data }) =>
+    data.draft === false && data.language === 'en' && data.kind === 'panchatantra'
+  );
+  return stories
+    .filter((s) => s.data.source?.kind === 'panchatantra')
+    .map((story) => ({
+      params: {
+        tantra: story.data.source!.panchatantra.tantra,
+        slug: idBasename(story),
+      },
+      props: { story },
+    }));
+}
+
+interface Props { story: CollectionEntry<'stories'>; }
+const { story } = Astro.props;
+const { Content } = await render(story);
+---
+
+<StoryPost post={story} locale="en">
+  <Content />
+</StoryPost>

@@ -1,0 +1,65 @@
+---
+/**
+ * /en/stories/ — Moral Stories & Folktales (English).
+ */
+import Layout from '../../../layouts/Layout.astro';
+import StoryCard from '../../../components/StoryCard.astro';
+import CategoryHeader from '../../../components/CategoryHeader.astro';
+import { publishedStories, storyRoute } from '../../../utils/content';
+
+const all = await publishedStories('en');
+const stories = all.filter((s) => s.data.kind === 'moral' || s.data.kind === 'folktale');
+
+const themes = Array.from(new Set(stories.flatMap((s) => s.data.themes))).sort();
+---
+
+<Layout
+  title="Stories · Moral Stories"
+  description="Original and classic moral stories for children — kindness, courage, honesty, and friendship."
+  locale="en"
+>
+  <CategoryHeader
+    emoji="🌙"
+    tamil="கதைகள்"
+    english="Moral Stories"
+    description="Original tales and folktales — kindness, courage, honesty, gratitude, friendship, family, and the world we share. Each story ends with a quiet lesson."
+    accentColor="nila"
+    count={stories.length}
+  />
+
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    {themes.length > 0 && (
+      <div class="mb-8 flex flex-wrap gap-2">
+        <span lang="en" class="text-sm font-display text-slate-500 mr-2 self-center">Themes:</span>
+        {themes.map((t) => (
+          <span class="px-3 py-1 rounded-full bg-nila-50 border border-nila-200 text-sm text-nila-800">
+            {t}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {stories.length === 0 ? (
+      <p class="text-slate-500 italic text-center py-12">
+        Stories coming soon.
+      </p>
+    ) : (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {stories.map((s) => (
+          <StoryCard
+            href={`/en${storyRoute(s)}`}
+            title={s.data.title}
+            titleEnglish={s.data.titleEnglish}
+            summary={s.data.summary}
+            cover={s.data.cover}
+            coverAlt={s.data.coverAlt}
+            badge={s.data.kind === 'folktale' ? 'Folktale' : 'Moral'}
+            accentColor="nila"
+            readingTimeMin={s.data.readingTimeMin}
+            ageRange={s.data.ageRange}
+          />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
