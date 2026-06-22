@@ -23,3 +23,4 @@ npm-debug.log*
 
 # Hostinger upload bundle (when generated)
 nilatales-hostinger.zip
+.worktrees/

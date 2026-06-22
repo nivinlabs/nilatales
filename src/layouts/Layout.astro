@@ -89,7 +89,7 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
       Skip to content
     </a>
 
-    <!-- Newspaper masthead (nameplate + date + Vol/Issue) -->
+    <!-- Brand header -->
     {showMasthead && <Masthead />}
 
     <!-- Sticky navigation -->
@@ -100,7 +100,7 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? 'htt
       <slot />
     </main>
 
-    <!-- Footer colophon -->
+    <!-- Footer -->
     <Colophon />
   </body>
 </html>

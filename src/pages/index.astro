@@ -27,11 +27,12 @@ import InstagramFeed from '../components/InstagramFeed.astro';
 import PremiumStories from '../components/PremiumStories.astro';
 import SupportSection from '../components/SupportSection.astro';
 import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
-import { publishedStories, publishedComics, publishedAudio, storyRoute, resolveCover, idBasename } from '../utils/content';
+import { publishedStories, publishedComics, publishedAudio, publishedActivities, storyRoute, resolveCover, idBasename } from '../utils/content';
 
-const stories  = await publishedStories();
-const comics   = await publishedComics();
-const audio    = await publishedAudio();
+const stories   = await publishedStories();
+const comics    = await publishedComics();
+const audio     = await publishedAudio();
+const activities = await publishedActivities();
 
 // Hero: featured story, fallback to most recent
 const heroStory = stories.find((s) => s.data.featured) ?? stories[0];
@@ -47,7 +48,7 @@ const pillars = [
   { emoji: '📚', cat: 'moss',   label: 'பஞ்சதந்திரம்', en: 'Panchatantra', href: '/panchatantra/', count: stories.filter(s => s.data.kind === 'panchatantra').length },
   { emoji: '🎨', cat: 'rose',   label: 'நகைச்சுவை', en: 'Comics',     href: '/comics/',     count: comics.length },
   { emoji: '🎧', cat: 'violet', label: 'கேட்க',    en: 'Listen',      href: '/listen/',     count: audio.length },
-  { emoji: '🖍️', cat: 'sky',    label: 'விளையாட்டு', en: 'Activities', href: '/activities/', count: 0 },
+  { emoji: '🖍️', cat: 'sky',    label: 'விளையாட்டு', en: 'Activities', href: '/activities/', count: activities.length },
 ];
 
 // Featured 3 stories (exclude hero)
@@ -142,7 +143,7 @@ function readingTime(story: { data: { body?: string } }) {
             <div class="flex items-center gap-2">
               <span class="chip">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                {heroStory.data.ageRange ?? '3–8'} yr
+                {heroStory.data.ageRange ? `${heroStory.data.ageRange.min}–${heroStory.data.ageRange.max}` : '3–8'} yr
               </span>
               <span class="chip">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -280,7 +281,7 @@ function readingTime(story: { data: { body?: string } }) {
                     <p class="font-rounded text-sm text-kohl-500 line-clamp-2 leading-relaxed">{story.data.summary}</p>
                   )}
                   <div class="flex items-center gap-2 mt-2">
-                    <span class="chip">{story.data.ageRange ?? '3–8'} yr</span>
+                    <span class="chip">{story.data.ageRange ? `${story.data.ageRange.min}–${story.data.ageRange.max}` : '3–8'} yr</span>
                     <span class="chip">{readingTime(story)}</span>
                   </div>
                 </div>
