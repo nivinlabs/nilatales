@@ -30,5 +30,6 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-# serve -s dist  → SPA fallback ( Astro static output has its own _redirects )
-CMD ["serve", "-s", "dist", "-l", "tcp://:8080", "--no-clipboard"]
+# serve dist (NO -s flag — Astro static output has real HTML files per route)
+# Using -s would enable SPA fallback and serve index.html for ALL paths
+CMD ["serve", "dist", "-l", "tcp://:8080", "--no-clipboard"]
