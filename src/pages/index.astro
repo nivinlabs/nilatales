@@ -26,7 +26,6 @@ import YouTubeEmbed from '../components/YouTubeEmbed.astro';
 import InstagramFeed from '../components/InstagramFeed.astro';
 import PremiumStories from '../components/PremiumStories.astro';
 import SupportSection from '../components/SupportSection.astro';
-import AdSensePlaceholder from '../components/AdSensePlaceholder.astro';
 import { publishedStories, publishedComics, publishedAudio, publishedActivities, storyRoute, resolveCover, idBasename } from '../utils/content';
 
 const stories   = await publishedStories();
@@ -41,14 +40,14 @@ const heroStory = stories.find((s) => s.data.featured) ?? stories[0];
 const kurals = stories.filter((s) => s.data.kind === 'thirukkural');
 const kuralStory = kurals.find((s) => s.data.featured) ?? kurals[0];
 
-// Six pillars
+// Six pillars — SVG icons (NOT emoji, per ui-ux-pro-max guidelines)
 const pillars = [
-  { emoji: '🌙', cat: 'leaf',   label: 'கதைகள்',  en: 'Stories',     href: '/stories/',    count: stories.filter(s => s.data.kind !== 'thirukkural' && s.data.kind !== 'panchatantra').length },
-  { emoji: '📜', cat: 'amber',  label: 'குறள்',    en: 'Kural',       href: '/kural/',      count: kurals.length },
-  { emoji: '📚', cat: 'moss',   label: 'பஞ்சதந்திரம்', en: 'Panchatantra', href: '/panchatantra/', count: stories.filter(s => s.data.kind === 'panchatantra').length },
-  { emoji: '🎨', cat: 'rose',   label: 'நகைச்சுவை', en: 'Comics',     href: '/comics/',     count: comics.length },
-  { emoji: '🎧', cat: 'violet', label: 'கேட்க',    en: 'Listen',      href: '/listen/',     count: audio.length },
-  { emoji: '🖍️', cat: 'sky',    label: 'விளையாட்டு', en: 'Activities', href: '/activities/', count: activities.length },
+  { icon: 'moon',     cat: 'leaf',   label: 'கதைகள்',  en: 'Stories',     href: '/stories/',    count: stories.filter(s => s.data.kind !== 'thirukkural' && s.data.kind !== 'panchatantra').length },
+  { icon: 'scroll',   cat: 'amber',  label: 'குறள்',    en: 'Kural',       href: '/kural/',      count: kurals.length },
+  { icon: 'book',     cat: 'moss',   label: 'பஞ்சதந்திரம்', en: 'Panchatantra', href: '/panchatantra/', count: stories.filter(s => s.data.kind === 'panchatantra').length },
+  { icon: 'palette',  cat: 'rose',   label: 'நகைச்சுவை', en: 'Comics',     href: '/comics/',     count: comics.length },
+  { icon: 'headphones', cat: 'violet', label: 'கேட்க',  en: 'Listen',      href: '/listen/',     count: audio.length },
+  { icon: 'pencil',   cat: 'sky',    label: 'விளையாட்டு', en: 'Activities', href: '/activities/', count: activities.length },
 ];
 
 // Featured 3 stories (exclude hero)
@@ -117,7 +116,7 @@ function readingTime(story: { data: { body?: string } }) {
                     loading="eager"
                   />
                 : <div class="w-full h-full bg-twilight-50 flex items-center justify-center">
-                    <span class="text-6xl">🌙</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--color-twilight-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                   </div>;
             })()}
             <div class="absolute inset-0 bg-kohl-900/0 group-hover:bg-kohl-900/20 transition-colors duration-300" aria-hidden="true"></div>
@@ -126,7 +125,7 @@ function readingTime(story: { data: { body?: string } }) {
           <!-- Right: deck -->
           <div class="flex flex-col gap-4">
             <span class="font-rounded font-bold text-sm text-twilight-500">
-              ✨ இன்றைய கதை · TONIGHT'S TALE
+              இன்றைய கதை · TONIGHT'S TALE
             </span>
 
             <h1 class="font-rounded-ta text-4xl md:text-5xl font-bold text-kohl-900 leading-tight tracking-tight">
@@ -176,7 +175,7 @@ function readingTime(story: { data: { body?: string } }) {
                 class="flex items-center gap-2 font-rounded text-sm font-semibold text-twilight-500 hover:text-twilight-700 transition-colors min-h-[44px]"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
-                🎧 Listen instead
+                Listen instead
               </a>
             )}
           </div>
@@ -195,18 +194,35 @@ function readingTime(story: { data: { body?: string } }) {
       <SectionHeader eyebrow="EXPLORE" tamil="பிரிவுகள்" />
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 clay-enter-stagger">
-        {pillars.map(({ emoji, cat, label, en, href, count }) => (
+        {pillars.map(({ icon, cat, label, en, href, count }) => (
           <a
             href={href}
             class="clay-card flex flex-col gap-3 p-5 rounded-2xl bg-paper-100 border border-paper-200 hover:border-paper-300 transition-all duration-200 hover:-translate-y-0.5 group"
             aria-label={`${label} — ${en} (${count} items)`}
           >
             <span
-              class="inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl"
-              style={`background: rgba(var(--color-${cat}), 0.12)`}
+              class="inline-flex items-center justify-center w-10 h-10 rounded-xl"
+              style={`background: rgba(var(--color-${cat}), 0.12); color: var(--color-${cat})`}
               aria-hidden="true"
             >
-              {emoji}
+              {icon === 'moon' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              )}
+              {icon === 'scroll' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/></svg>
+              )}
+              {icon === 'book' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+              )}
+              {icon === 'palette' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+              )}
+              {icon === 'headphones' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-5a9 9 0 0 1 18 0v5a1 1 0 0 1-1 1h-2a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>
+              )}
+              {icon === 'pencil' && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              )}
             </span>
             <div>
               <p class="font-rounded-ta text-base font-semibold text-kohl-700 leading-none">{label}</p>
@@ -269,7 +285,9 @@ function readingTime(story: { data: { body?: string } }) {
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
                       />
-                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-4xl" aria-hidden="true">📖</div>
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-twilight-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      </div>
                   }
                 </div>
                 <div class="flex flex-col gap-2 p-5">
@@ -319,7 +337,7 @@ function readingTime(story: { data: { body?: string } }) {
               >
                 <div class="flex items-center justify-between">
                   <span class={`cat-pill cat-pill-${accent} w-fit`}>
-                    {a.data.type === 'lullaby' ? '🎵 LULLABY' : '🎧 NARRATION'}
+                    {a.data.type === 'lullaby' ? 'LULLABY' : 'NARRATION'}
                   </span>
                   <button
                     type="button"
@@ -387,7 +405,9 @@ function readingTime(story: { data: { body?: string } }) {
                         class="w-full h-full object-cover rounded-2xl"
                         loading="lazy"
                       />
-                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center text-5xl rounded-xl" aria-hidden="true">🎨</div>
+                    : <div class="w-full h-full bg-twilight-50 flex items-center justify-center rounded-xl" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--color-twilight-300)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                      </div>
                   }
                 </div>
                 <div class="p-4 pt-2 flex flex-col gap-1">
@@ -488,12 +508,7 @@ function readingTime(story: { data: { body?: string } }) {
   <InstagramFeed />
 
   <!-- ══════════════════════════════════════════════
-       §10d AD SENSE (placeholder — horizontal)
-  ══════════════════════════════════════════════ -->
-  <AdSensePlaceholder format="horizontal" slotId="nilatales-home-leaderboard" />
-
-  <!-- ══════════════════════════════════════════════
-       §10e PREMIUM STORIES (coming soon)
+       §10d PREMIUM STORIES (coming soon)
   ══════════════════════════════════════════════ -->
   <PremiumStories />
 

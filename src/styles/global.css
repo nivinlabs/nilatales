@@ -81,10 +81,6 @@
   --clay-comic:  inset -3px -3px 10px rgba(255, 255, 255, 0.9), inset 2px 2px 6px rgba(0, 0, 0, 0.05), 8px 8px 24px rgba(60, 50, 90, 0.18);
   --clay-pressed:inset 3px 3px 8px rgba(60, 50, 90, 0.15),       inset -1px -1px 4px rgba(255, 255, 255, 0.5);
 
-  /* ── Newspaper rules ──────────────────────────────────────────── */
-  --rule:         1px solid var(--color-paper-300);
-  --rule-strong:   2px solid var(--color-kohl-700);
-
   /* ── Claymorphism pastel surfaces (never pure white) ──────────── */
   --color-clay-bg:      #F4F1FA;   /* cool lavender-white base */
   --color-clay-surface: rgba(255, 255, 255, 0.72);  /* glass-clay card */
@@ -141,17 +137,9 @@ h1, h2, h3, h4, h5, h6,
   text-wrap: balance;
 }
 
-/* ─── 4. Newspaper utilities ───────────────────────────────────────────── */
+/* ─── 4. Utility classes ───────────────────────────────────────────── */
 
-/* Vol/Issue, dateline, ISSN — editorial chrome in mono */
-.font-mono-editorial {
-  font-family: var(--font-mono);
-  letter-spacing: 0.06em;
-  font-size: 0.75rem;
-  color: var(--color-kohl-500);
-}
-
-/* Eyebrow label — small caps mono */
+/* Eyebrow label — small caps mono (still used by SectionHeader, PremiumStories) */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.6875rem;   /* 11px */
@@ -160,10 +148,6 @@ h1, h2, h3, h4, h5, h6,
   text-transform: uppercase;
   color: var(--color-kohl-500);
 }
-
-/* Newspaper rule — hairline */
-.rule { border-top: var(--rule); }
-.rule-strong { border-top: var(--rule-strong); }
 
 /* 3px left bar in category accent color (newspaper table rows) */
 .row-accent-leaf   { border-left: 3px solid var(--color-leaf);   padding-left: 0.75rem; }
@@ -467,8 +451,6 @@ section[id] {
                   inset -1px -1px 4px rgba(255,255,255,0.05);
   --gradient-clay-cta: linear-gradient(135deg, #9d7ff0 0%, #6b4fb8 100%);
   --gradient-clay-cta-hover: linear-gradient(135deg, #8b6fe8 0%, #5b3fb0 100%);
-  --rule: 1px solid var(--color-paper-300);
-  --rule-strong: 2px solid var(--color-kohl-700);
 }
 
 .bedtime-active body {

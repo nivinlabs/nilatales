@@ -76,7 +76,7 @@ export async function resolveCover(
 
 export async function publishedStories(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Story[]> {
   const all = await getCollection('stories', ({ data }) => {
-    if (!includeDrafts && data.draft === false) return false;
+    if (!includeDrafts && data.draft === true) return false;
     if (data.language !== locale && data.language !== 'ta-en') return false;
     return true;
   });
@@ -85,7 +85,7 @@ export async function publishedStories(locale: 'ta' | 'en' = 'ta', includeDrafts
 
 export async function publishedComics(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Comic[]> {
   const all = await getCollection('comics', ({ data }) => {
-    if (!includeDrafts && data.draft === false) return false;
+    if (!includeDrafts && data.draft === true) return false;
     if (data.language !== locale && data.language !== 'ta-en') return false;
     return true;
   });
@@ -94,7 +94,7 @@ export async function publishedComics(locale: 'ta' | 'en' = 'ta', includeDrafts 
 
 export async function publishedAudio(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Audio[]> {
   const all = await getCollection('audio', ({ data }) => {
-    if (!includeDrafts && data.draft === false) return false;
+    if (!includeDrafts && data.draft === true) return false;
     if (data.language !== locale && data.language !== 'ta-en') return false;
     return true;
   });
@@ -103,7 +103,7 @@ export async function publishedAudio(locale: 'ta' | 'en' = 'ta', includeDrafts =
 
 export async function publishedActivities(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Activity[]> {
   const all = await getCollection('activities', ({ data }) => {
-    if (!includeDrafts && data.draft === false) return false;
+    if (!includeDrafts && data.draft === true) return false;
     if (data.language !== locale && data.language !== 'ta-en') return false;
     return true;
   });
@@ -112,7 +112,7 @@ export async function publishedActivities(locale: 'ta' | 'en' = 'ta', includeDra
 
 export async function publishedResources(locale: 'ta' | 'en' = 'ta', includeDrafts = false): Promise<Resource[]> {
   const all = await getCollection('resources', ({ data }) => {
-    if (!includeDrafts && data.draft === false) return false;
+    if (!includeDrafts && data.draft === true) return false;
     if (data.language !== locale && data.language !== 'ta-en') return false;
     return true;
   });
